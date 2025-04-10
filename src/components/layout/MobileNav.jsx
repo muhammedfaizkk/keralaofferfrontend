@@ -6,11 +6,11 @@ const MobileNav = ({ toggleMenu, isMenuOpen }) => {
 
   const handleSearch = () => {
     console.log('Search for:', searchTerm);
-    // Implement your search logic here
+    // Add your search logic here
   };
 
   return (
-    <div className="md:hidden fixed top-0 left-0 right-0 z-20 p-4 bg-white shadow-md flex items-center space-x-3 rounded-md">
+    <div className="md:hidden fixed top-0 left-0 right-0 z-30 p-4 bg-white shadow-sm flex items-center space-x-3">
       {/* Hamburger toggle button */}
       {!isMenuOpen && (
         <button 
@@ -21,7 +21,7 @@ const MobileNav = ({ toggleMenu, isMenuOpen }) => {
         </button>
       )}
 
-      {/* Search input */}
+      {/* Search bar */}
       <div className="flex flex-1 items-center border border-gray-300 rounded-md px-2 bg-white">
         <input
           type="text"
