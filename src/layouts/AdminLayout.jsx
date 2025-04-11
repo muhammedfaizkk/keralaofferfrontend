@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Sidebar from '../components/layout/Sidebar';
-import MainContent from '../components/layout/MainContent';
-import MobileNav from '../components/layout/MobileNav';
+import { Outlet } from 'react-router-dom';
+import Sidebar from '../components/admin/layout/Sidebar';
+import MobileNav from '../components/admin/layout/MobileNav';
 
-const Dashboard = () => {
+function AdminLayout() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const sidebarRef = useRef();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     const toggleMobileMenu = () => {
         setMobileMenuOpen((prev) => !prev);
     };
 
-    // Close sidebar on outside click (mobile)
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -41,16 +40,14 @@ const Dashboard = () => {
             {/* Mobile Nav */}
             <div className="md:hidden fixed top-0 left-0 right-0 z-50">
                 <MobileNav toggleMenu={toggleMobileMenu} isMenuOpen={mobileMenuOpen} />
-
-
             </div>
 
             {/* Main Content */}
             <div className="flex-1 ml-0 mt-14 md:mt-0 h-full overflow-y-auto p-4">
-                <MainContent />
+                <Outlet />
             </div>
         </div>
     );
-};
+}
 
-export default Dashboard;
+export default AdminLayout;

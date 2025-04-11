@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import { userLeaderboard, groupLeaderboard } from '../../data/mockData';
+import { userLeaderboard, groupLeaderboard } from '../../../data/mockData';
 
 const Leaderboard = ({ type }) => {
   const leaderboardData = type === 'user' ? userLeaderboard : groupLeaderboard;

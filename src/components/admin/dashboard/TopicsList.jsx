@@ -1,6 +1,6 @@
 import React from 'react';
 import TopicCard from './TopicCard';
-import { weakestTopics, strongestTopics } from '../../data/mockData';
+import { weakestTopics, strongestTopics } from '../../../data/mockData';
 
 const TopicsList = ({ type }) => {
   const topics = type === 'weakest' ? weakestTopics : strongestTopics;

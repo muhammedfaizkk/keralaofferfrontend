@@ -6,7 +6,7 @@ import ActivityChart from '../dashboard/ActivityChart';
 import TopicsList from '../dashboard/TopicsList';
 import Leaderboard from '../dashboard/Leaderboard';
 import { Download } from 'lucide-react';
-import { activityData } from '../../data/mockData';
+import { activityData } from '../../../data/mockData';
 
 const MainContent = () => {
   return (
