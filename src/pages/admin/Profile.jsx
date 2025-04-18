@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import MembersTable from '../../components/admin/tables/MembersTable';
+import { useResetPassword } from '../../hooks/common/Userlogins'; // adjust path if needed
+import { toast } from 'react-toastify';
+
 
 const Profile = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  const { resetPassword } = useResetPassword();
+
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [profile, setProfile] = useState({
-    email: 'rafiqurrahman51@gmail.com',
-    password: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   const handleInputChange = (e) => {
@@ -13,68 +18,96 @@ const Profile = () => {
     setProfile(prev => ({ ...prev, [name]: value }));
   };
 
-  const toggleEdit = () => {
-    setIsEditing(!isEditing);
+  const handleResetPassword = async () => {
+    if (profile.newPassword !== profile.confirmPassword) {
+      toast.error("Passwords don't match");
+      return;
+    }
+  
+    try {
+      await resetPassword(profile.currentPassword, profile.newPassword);
+      toast.success('Password updated successfully!');
+      
+      // Reset form and toggle UI state
+      setProfile({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      setIsEditingPassword(false);
+      
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Failed to update password');
+    }
   };
+  
 
   return (
-    <div className="mx-auto my-5 p-5 rounded-lg shadow-sm bg-white">
+    <div className="mx-auto my-5 p-5 rounded-lg shadow-md bg-white">
       <div className="mb-6 pb-5 border-b border-gray-200">
         <h1 className="text-2xl font-semibold text-gray-800">Account Settings</h1>
         <p className="text-sm text-gray-500 mt-1">Update your email or reset your password.</p>
       </div>
 
-      <div className="space-y-6">
-        {isEditing ? (
-          <>
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-              <input
-                type="email"
-                name="email"
-                value={profile.email}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
+      {/* Password Section */}
+      <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-medium text-gray-700">Password</h2>
+          <button
+            onClick={() => setIsEditingPassword(!isEditingPassword)}
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            {isEditingPassword ? 'Cancel' : 'Reset Password'}
+          </button>
+        </div>
 
-            {/* Reset Password */}
+        {isEditingPassword ? (
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reset Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
               <input
                 type="password"
-                name="password"
-                value={profile.password}
+                name="currentPassword"
+                value={profile.currentPassword}
                 onChange={handleInputChange}
-                placeholder="Enter new password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-          </>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={profile.newPassword}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={profile.confirmPassword}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="flex justify-end mt-2">
+              <button
+                onClick={handleResetPassword}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Update Password
+              </button>
+            </div>
+          </div>
         ) : (
-          <>
-            <div className="flex flex-col sm:flex-row">
-              <div className="w-full sm:w-40 font-medium text-gray-600">Email Address</div>
-              <div className="flex-1 text-gray-800">{profile.email}</div>
-            </div>
-            <div className="flex flex-col sm:flex-row">
-              <div className="w-full sm:w-40 font-medium text-gray-600">Password</div>
-              <div className="flex-1 text-gray-500">••••••••</div>
-            </div>
-          </>
+          <div className="text-gray-500">
+            ●●●●●●●●●● <span className="text-xs text-gray-400">(hidden for security)</span>
+          </div>
         )}
       </div>
-
-      <div className="mt-6">
-        <button
-          onClick={toggleEdit}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          {isEditing ? 'Save Changes' : 'Edit'}
-        </button>
-      </div>
-      <MembersTable/>
     </div>
   );
 };

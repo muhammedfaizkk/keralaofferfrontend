@@ -3,7 +3,7 @@ import {
   FaChartBar, FaBook, FaUsers, FaTasks, FaStore,
   FaTags, FaUser, FaLayerGroup, FaMapMarkerAlt,
   FaGift, FaThLarge, FaQuestionCircle, FaCog, FaTimes,
-  FaChevronDown, FaChevronUp, FaHome
+  FaChevronDown, FaChevronUp, FaHome, FaSignOutAlt
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,6 +29,13 @@ const Sidebar = ({ isOpen, onClose }) => {
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('keralaoffertoken');
+    
+    // Redirect to login page
+    navigate('/admin/login');
   };
 
   return (
@@ -68,30 +75,13 @@ const Sidebar = ({ isOpen, onClose }) => {
               {dropdowns.stores ? <FaChevronUp /> : <FaChevronDown />}
             </div>
             <div className={`ml-10 overflow-hidden transition-all duration-300 ease-in-out ${dropdowns.stores ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <div onClick={() => navigateTo('/admin/store')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Stores</div>
+              <div onClick={() => navigateTo('/admin/store')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Stores</div>
               <div onClick={() => navigateTo('/admin/add-store')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Add Stores</div>
             </div>
           </div>
 
-       
-          <div>
-            <div onClick={() => toggleDropdown('banners')} className="flex items-center justify-between p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
-              <div className="flex items-center">
-                <FaTags className="mr-3" />
-                <span>Banners</span>
-              </div>
-              {dropdowns.banners ? <FaChevronUp /> : <FaChevronDown />}
-            </div>
-            <div className={`ml-10 overflow-hidden transition-all duration-300 ease-in-out ${dropdowns.banners ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-              <div onClick={() => navigateTo('/admin/banners')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Banner</div>
-            </div>
-          </div>
-
           {/* Users */}
-          <div onClick={() => navigateTo('/admin/users')} className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
-            <FaUser className="mr-3" />
-            <span>Users</span>
-          </div>
+          
 
           {/* Data Manage */}
           <div>
@@ -112,13 +102,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         <div className="pt-8">
           <h3 className="font-medium text-gray-500 uppercase text-xs tracking-wider mb-4">Support</h3>
-
-          {/* <div onClick={() => navigateTo('/admin')} className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
-            <FaQuestionCircle className="mr-3" />
-            <span>FAQ / Help</span>
-          </div> */}
-
-          {/* Settings */}
+          <div  className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
+            <FaUser className="mr-3" />
+            <span>Users</span>
+          </div>
           <div>
             <div onClick={() => toggleDropdown('settings')} className="flex items-center justify-between p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
               <div className="flex items-center">
@@ -131,6 +118,12 @@ const Sidebar = ({ isOpen, onClose }) => {
               <div onClick={() => navigateTo('/admin/profile')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Profile</div>
             </div>
           </div>
+        </div>
+
+        {/* Logout Button */}
+        <div onClick={handleLogout} className="flex items-center p-3 text-gray-700 hover:bg-red-50 rounded-md cursor-pointer mt-auto">
+          <FaSignOutAlt className="mr-3 text-red-500" />
+          <span className="text-red-500">Logout</span>
         </div>
       </div>
     </div>

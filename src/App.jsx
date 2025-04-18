@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
+
     <Router>
       <ToastContainer
         position="top-center"
@@ -20,16 +21,15 @@ function App() {
         pauseOnHover
         theme="light"
       />
-
-      
       <Routes>
-        
-        {User()}
-        {Admin()}
-
-
+        <Route path="/*" element={<User />} />
+        <Route path="/admin/*" element={<Admin />} />
       </Routes>
     </Router>
+
+
+
+
   );
 }
 

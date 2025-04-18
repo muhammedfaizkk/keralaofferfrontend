@@ -10,7 +10,8 @@ const Addlocations = ({ onClose, locationToEdit,refetch }) => {
   const { createLocation, loading: createLoading, error: createError } = useCreateLocation();
   const { updateLocation, loading: updateLoading, error: updateError } = useUpdateLocation();
 
-  // Set the form for editing when locationToEdit is provided
+
+  
   useEffect(() => {
     if (locationToEdit) {
       setSelectedDistrict(locationToEdit.district);
@@ -21,18 +22,19 @@ const Addlocations = ({ onClose, locationToEdit,refetch }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDistrict || !selectedLocation) {
-      toast.error('Please select both district and location.'); // Toast error if fields are empty
+      toast.error('Please select both district and location.');
       return;
     }
 
     try {
       if (locationToEdit) {
-        // If editing, call updateLocation API
+  
         await updateLocation(locationToEdit._id, selectedDistrict, selectedLocation);
         toast.success('Location updated successfully!');
       } else {
         // If creating, call createLocation API
         await createLocation(selectedDistrict, selectedLocation);
+        
         refetch()
         toast.success('Location created successfully!');
       }
@@ -70,7 +72,7 @@ const Addlocations = ({ onClose, locationToEdit,refetch }) => {
                 <option disabled>Loading...</option>
               ) : (
                 districts?.map((district) => (
-                  <option key={district} value={district}>
+                  <option key={district} value={district.title}>
                     {district.title}
                   </option>
                 ))
