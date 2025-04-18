@@ -33,23 +33,25 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const handleLogout = () => {
     localStorage.removeItem('keralaoffertoken');
-    
-    // Redirect to login page
     navigate('/admin/login');
   };
 
   return (
     <div className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static z-40 h-full bg-white shadow-lg w-64 transition-transform duration-300`}>
       <div className="flex flex-col h-full p-4 relative">
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 md:hidden text-gray-500 hover:text-red-500"
         >
           <FaTimes size={20} />
         </button>
 
-        <div className="mb-8">
-          <img src="/logonav.png" className='h-25 w-50' alt="Logo" />
+        <div className="hidden md:block">
+          <img src="/logonav.png" className="h-25 w-50" alt="Logo" />
+        </div>
+
+        <div className="block md:hidden mt-12">
+          <img src="/logonav.png" className="h-25 w-50" alt="Logo" />
         </div>
 
         <nav className="space-y-1">
@@ -60,10 +62,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </div>
 
           {/* Reports */}
-          <div onClick={() => navigateTo('/admin')} className="flex items-center p-3 bg-blue-50 text-blue-600 rounded-md cursor-pointer">
-            <FaChartBar className="mr-3" />
-            <span>Reports</span>
-          </div>
+
 
           {/* Stores */}
           <div>
@@ -76,12 +75,12 @@ const Sidebar = ({ isOpen, onClose }) => {
             </div>
             <div className={`ml-10 overflow-hidden transition-all duration-300 ease-in-out ${dropdowns.stores ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
               <div onClick={() => navigateTo('/admin/store')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Stores</div>
-              <div onClick={() => navigateTo('/admin/add-store')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Add Stores</div>
+
             </div>
           </div>
 
           {/* Users */}
-          
+
 
           {/* Data Manage */}
           <div>
@@ -102,7 +101,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         <div className="pt-8">
           <h3 className="font-medium text-gray-500 uppercase text-xs tracking-wider mb-4">Support</h3>
-          <div  className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
+          <div className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
             <FaUser className="mr-3" />
             <span>Users</span>
           </div>

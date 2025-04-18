@@ -8,7 +8,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// 🔐 Automatically add token from localStorage to Authorization header
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('keralaoffertoken');

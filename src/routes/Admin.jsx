@@ -11,6 +11,7 @@ import Offertype from '../pages/admin/Offertype';
 import StoreDisplay from '../pages/admin/StoreDisplay';
 import Login from '../pages/common/Login';
 import Protected from '../components/protected/Protected';
+import AddStores from '../components/admin/forms/Addstores';
 
 const Admin = () => (
   <Routes>
@@ -26,6 +27,7 @@ const Admin = () => (
       <Route path="store-category" element={<Storecategory />} />
       <Route path="offer-types" element={<Offertype />} />
       <Route path="storeads/:id" element={<StoreDisplay />} />
+      <Route path="addstore" element={<AddStores/>} />
     </Route>
   </Routes>
 );

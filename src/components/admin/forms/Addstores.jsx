@@ -36,9 +36,6 @@ const AddStores = ({ mode = 'add', store = null, onClose, refetch }) => {
         logoUrl: false
     });
 
-    console.log('formData',formData);
-    
-
     const [previewImage, setPreviewImage] = useState(null);
     const { location: locations, loading: locationLoading } = useGetLocationByDistrict(formData.district);
 
@@ -132,13 +129,17 @@ const AddStores = ({ mode = 'add', store = null, onClose, refetch }) => {
     const uniqueDistricts = [...new Set(allLocations?.map(loc => loc.district))];
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-                <div className="flex justify-between items-center p-4 border-b">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-2 my-4 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
                     <h2 className="text-xl font-semibold">
                         {mode === 'add' ? 'Add New Store' : 'Edit Store'}
                     </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                    <button 
+                        onClick={onClose} 
+                        className="text-gray-500 hover:text-gray-700"
+                        aria-label="Close modal"
+                    >
                         <X className="h-5 w-5" />
                     </button>
                 </div>
@@ -339,7 +340,7 @@ const AddStores = ({ mode = 'add', store = null, onClose, refetch }) => {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-end space-x-3 pt-6">
+                    <div className="flex justify-end space-x-3 pt-6 pb-2 sticky bottom-0 bg-white">
                         <button
                             type="button"
                             onClick={onClose}
@@ -349,7 +350,7 @@ const AddStores = ({ mode = 'add', store = null, onClose, refetch }) => {
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                             disabled={createLoading || updateLoading}
                         >
                             {mode === 'add'

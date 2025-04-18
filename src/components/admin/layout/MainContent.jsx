@@ -32,7 +32,7 @@ const MainContent = () => {
         </button>
       </div>
 
-      <FilterControls />
+      {/* <FilterControls /> */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <MetricCard title="Stores" value={storeCount} />
