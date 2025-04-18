@@ -39,13 +39,12 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
             return;
         }
 
-        // Validate image types and sizes
         const validFiles = files.filter(file => {
             if (!file.type.startsWith('image/')) {
                 toast.warning(`File ${file.name} is not an image and was skipped.`);
                 return false;
             }
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            if (file.size > 5 * 1024 * 1024) {
                 toast.warning(`Image ${file.name} is too large (max 5MB).`);
                 return false;
             }
@@ -113,10 +112,11 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl md:max-w-4xl transition-all transform scale-100 animate-fadeIn my-8">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 md:p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-none md:rounded-lg shadow-xl w-full h-screen md:h-auto md:max-h-[90vh] md:max-w-2xl lg:max-w-4xl transition-all transform scale-100 animate-fadeIn overflow-y-auto">
+                {/* Header - Sticky on mobile */}
                 <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-                    <h2 className="text-xl font-semibold text-gray-800">
+                    <h2 className="text-lg font-semibold text-gray-800">
                         {editData ? 'Edit Store Ad' : 'Add New Store Ad'}
                     </h2>
                     <button
@@ -124,30 +124,31 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
                         className="text-gray-500 hover:text-gray-700 transition-colors"
                         aria-label="Close modal"
                     >
-                        <X className="h-6 w-6" />
+                        <X className="h-5 w-5" />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Left Column */}
+                {/* Form Content - Scrollable area */}
+                <div className="overflow-y-auto h-[calc(100vh-120px)] md:h-auto">
+                    <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
+                        {/* Single column layout for better mobile experience */}
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Start Date <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required
                                     min={new Date().toISOString().split('T')[0]}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     End Date <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -155,19 +156,19 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
                                     value={endDate}
                                     min={startDate || new Date().toISOString().split('T')[0]}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Offer Type <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={offerType}
                                     onChange={(e) => setOfferType(e.target.value)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required
                                 >
                                     <option value="" disabled>Select offer type</option>
@@ -178,37 +179,34 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
                                     ))}
                                 </select>
                             </div>
-                        </div>
 
-                        {/* Right Column */}
-                        <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Description <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <textarea
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                        placeholder="Enter a detailed description for the ad..."
+                                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter ad description..."
                                         required
                                         rows={4}
                                     />
-                                    <MdDescription className="absolute right-3 top-3 text-gray-400" />
+                                    <MdDescription className="absolute right-2 top-2 text-gray-400" />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Ad Images <span className="text-red-500">*</span>
                                     <span className="text-xs text-gray-500 ml-1">(Max 5 images, 5MB each)</span>
                                 </label>
 
-                                <label className={`flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-lg cursor-pointer transition-all ${existingImages.length + adsImages.length >= 5 ? 'border-gray-200 bg-gray-50' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'}`}>
+                                <label className={`flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-all ${existingImages.length + adsImages.length >= 5 ? 'border-gray-200 bg-gray-50' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'}`}>
                                     <div className="flex flex-col items-center justify-center text-center">
-                                        <ImageIcon className="h-8 w-8 text-gray-400 mb-2" />
-                                        <p className="text-sm text-gray-600">
+                                        <ImageIcon className="h-6 w-6 text-gray-400 mb-1" />
+                                        <p className="text-xs text-gray-600">
                                             {existingImages.length + adsImages.length >= 5 ?
                                                 'Maximum images reached' :
                                                 'Click to upload or drag and drop'}
@@ -230,89 +228,92 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
                                     />
                                 </label>
                             </div>
+
+                            {/* Image Previews */}
+                            <div className="space-y-2">
+                                <h3 className="text-sm font-medium text-gray-700">
+                                    Selected Images ({existingImages.length + adsImages.length}/5)
+                                </h3>
+
+                                {existingImages.length === 0 && adsImages.length === 0 ? (
+                                    <div className="text-center py-2 text-gray-500 text-sm">
+                                        No images selected yet
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {existingImages.map((image, index) => (
+                                            <div key={`existing-${index}`} className="relative group">
+                                                <img
+                                                    src={image}
+                                                    alt={`Existing ${index}`}
+                                                    className="h-24 w-full rounded-lg shadow-sm border object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index, true)}
+                                                    className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 opacity-70 group-hover:opacity-100 transition-opacity"
+                                                    aria-label="Remove image"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+
+                                        {adsImages.map((image, index) => (
+                                            <div key={`new-${index}`} className="relative group">
+                                                <img
+                                                    src={URL.createObjectURL(image)}
+                                                    alt={`Preview ${index}`}
+                                                    className="h-24 w-full rounded-lg shadow-sm border object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index, false)}
+                                                    className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 opacity-70 group-hover:opacity-100 transition-opacity"
+                                                    aria-label="Remove image"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xxs p-0.5 truncate">
+                                                    {image.name}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                    {/* Image Previews */}
-                    <div className="space-y-3">
-                        <h3 className="text-sm font-medium text-gray-700">
-                            Selected Images ({existingImages.length + adsImages.length}/5)
-                        </h3>
-
-                        {existingImages.length === 0 && adsImages.length === 0 ? (
-                            <div className="text-center py-4 text-gray-500">
-                                No images selected yet
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                                {existingImages.map((image, index) => (
-                                    <div key={`existing-${index}`} className="relative group">
-                                        <img
-                                            src={image}
-                                            alt={`Existing ${index}`}
-                                            className="h-32 w-full rounded-lg shadow-sm border object-cover"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => removeImage(index, true)}
-                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            aria-label="Remove image"
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                    </div>
-                                ))}
-
-                                {adsImages.map((image, index) => (
-                                    <div key={`new-${index}`} className="relative group">
-                                        <img
-                                            src={URL.createObjectURL(image)}
-                                            alt={`Preview ${index}`}
-                                            className="h-32 w-full rounded-lg shadow-sm border object-cover"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => removeImage(index, false)}
-                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            aria-label="Remove image"
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
-                                            {image.name}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Form Actions */}
-                    <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t">
+                {/* Sticky Footer - Always visible */}
+                <div className="sticky bottom-0 bg-white border-t p-4">
+                    <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                             disabled={loading}
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
+                            onClick={handleSubmit}
                             disabled={loading}
-                            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-colors flex items-center justify-center text-sm"
                         >
                             {loading ? (
                                 <>
-                                    <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                                    <Loader2 className="animate-spin h-4 w-4 mr-1" />
                                     <span>Processing...</span>
                                 </>
                             ) : (
-                                <span>{editData ? 'Update Ad' : 'Create Ad'}</span>
+                                <span>{editData ? 'Update' : 'Create'}</span>
                             )}
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
