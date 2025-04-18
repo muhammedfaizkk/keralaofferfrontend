@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MembersTable from '../../components/common/tables/MembersTable';
+import MembersTable from '../../components/admin/tables/MembersTable';
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);

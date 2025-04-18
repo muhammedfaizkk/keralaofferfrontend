@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Plus } from 'lucide-react';
-import LocationTable from '../../components/common/tables/LocationTable';
-import Addbanner from '../../components/admin/forms/Addbanner';
+import LocationTable from '../../components/admin/tables/LocationTable';
 import Addlocations from '../../components/admin/forms/Addlocations';
+import { useGetLocations } from '../../hooks/admin/ManageDatahooks';
 
 
 function Locations() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { locations, refetch } = useGetLocations();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -65,11 +66,12 @@ function Locations() {
 
       {isModalOpen && (
         <Addlocations
-          onClose={() => setIsModalOpen(false)}
+        refetch={refetch}
+          onClose={() => setIsModalOpen(false) }
         />
       )}
       <div className="mt-4 border-t pt-4">
-        <LocationTable />
+        <LocationTable locations={locations} refetch={refetch} />
       </div>
     </div>
   );

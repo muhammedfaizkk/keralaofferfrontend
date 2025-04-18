@@ -1,23 +1,53 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Plus } from 'lucide-react';
 import Bannercard from '../../components/common/Bannercard';
 import Addbanner from '../../components/admin/forms/Addbanner';
-
+import { useFetchBanners, useDeleteBanner } from '../../hooks/admin/Bannerhooks';
+import DeleteConfirmation from '../../components/common/DeleteConfirmation';
 
 function Banners() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedBanner, setSelectedBanner] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { banners, loading, refetch } = useFetchBanners();
+  const { deleteBanner } = useDeleteBanner();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const pathSegments = location.pathname.split('/').filter(Boolean);
-
   const formatSegment = (segment) =>
     segment.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
+  const handleBannerAdded = () => {
+    setIsModalOpen(false);
+    refetch();
+  };
+
+  const handleDelete = async () => {
+    if (selectedBanner) {
+      await deleteBanner(selectedBanner._id);
+      setIsDeleteModalOpen(false);
+      refetch();
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedBanner(null);
+  };
+
+  // Display all banners by default or filter based on search term
+  const filteredBanners = searchTerm
+    ? banners.filter((banner) =>
+        banner?.heading?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : banners;
+
   return (
     <div className="p-4 sm:p-6 bg-white rounded-xl shadow-sm">
-      {/* ✅ Breadcrumb */}
+      {/* Breadcrumb */}
       <div className="text-sm text-gray-400 mb-3">
         {pathSegments.map((segment, idx) => (
           <span key={idx}>
@@ -29,19 +59,21 @@ function Banners() {
         ))}
       </div>
 
-      {/* ✅ Title */}
+      {/* Title */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Banners</h1>
-        <p className="text-sm text-gray-500">Manage your store members and details</p>
+        <p className="text-sm text-gray-500">Manage your banner collection</p>
       </div>
 
-      {/* ✅ Actions: Search + Buttons */}
+      {/* Actions */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         {/* Search Bar */}
         <div className="relative w-full md:max-w-sm">
           <input
             type="text"
-            placeholder="Search stores..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search banners..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
@@ -61,14 +93,37 @@ function Banners() {
           </button>
         </div>
       </div>
-      {isModalOpen && (
-        <Addbanner 
-          onClose={() => setIsModalOpen(false)}
+
+      {/* Modal */}
+      {isModalOpen && <Addbanner onClose={() => setIsModalOpen(false)} onSuccess={handleBannerAdded} />}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <DeleteConfirmation
+          itemName={selectedBanner?.title}
+          onCancel={handleDeleteCancel}
+          onDelete={handleDelete}
         />
       )}
 
-      <div className="mt-4 border-t pt-4">
-        <Bannercard/>
+      {/* Banner Cards */}
+      <div className="mt-4 border-t pt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {loading ? (
+          <p>Loading banners...</p>
+        ) : filteredBanners.length > 0 ? (
+          filteredBanners.map((banner) => (
+            <Bannercard
+              key={banner._id}
+              banner={banner}
+              onDelete={() => {
+                setSelectedBanner(banner);
+                setIsDeleteModalOpen(true);
+              }}
+            />
+          ))
+        ) : (
+          <p>No banners found.</p>
+        )}
       </div>
     </div>
   );

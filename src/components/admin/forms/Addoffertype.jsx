@@ -1,59 +1,109 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { X, Loader2 } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { useCreateOffertype, useUpdateOffertype } from '../../../hooks/admin/Offertypehooks';
 
-const Addoffertype = ({ onClose }) => {
-  const [offertype, setoffertype] = useState('');
+const Addoffertype = ({ onClose, refetch, editData }) => {
+  const [offerType, setOfferType] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const { createOffertype, loading: creating } = useCreateOffertype();
+  const { updateOffertype, loading: updating } = useUpdateOffertype();
+
+  useEffect(() => {
+    if (editData) {
+      setOfferType(editData.title || '');
+    }
+  }, [editData]);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (!storeCategory.trim()) {
-      alert('Please enter a store category.');
+    setIsSubmitting(true);
+
+    if (!offerType.trim()) {
+      toast.error('Offer type name is required');
+      setIsSubmitting(false);
       return;
     }
 
-    // TODO: Handle submission logic (e.g. send to API or state)
-    console.log('Submitted Store Category:', storeCategory);
+    if (offerType.trim().length < 2 || offerType.trim().length > 50) {
+      toast.error('Offer type name must be between 2-50 characters');
+      setIsSubmitting(false);
+      return;
+    }
 
-    // Close modal or reset field
-    setStoreCategory('');
-    onClose();
-  };
+    try {
+      if (editData) {
+        await updateOffertype(editData._id, { title: offerType });
+        toast.success('Offer type updated successfully!');
+      } else {
+        await createOffertype({ title: offerType });
+        toast.success('Offer type created successfully!');
+      }
+      refetch?.();
+      onClose();
+    } catch (error) {
+      toast.error(error.message || 'Something went wrong!');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [offerType, editData, createOffertype, updateOffertype, refetch, onClose]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">Add offertype</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] sm:w-[400px] relative">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-600 transition"
+          aria-label="Close modal"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Enter offertype</label>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          {editData ? 'Edit Offer Type' : 'Add New Offer Type'}
+        </h2>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="offerType" className="block text-sm font-medium text-gray-700 mb-1">
+              Offer Type <span className="text-red-500">*</span>
+            </label>
             <input
+              id="offerType"
               type="text"
-              value={offertype}
-              onChange={(e) => setoffertype(e.target.value)}
-              placeholder="Type category name"
-              className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={offerType}
+              onChange={(e) => setOfferType(e.target.value)}
+              placeholder="Enter offer type name"
+              className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              maxLength={50}
+              aria-required="true"
             />
           </div>
 
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-between gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+              className="w-1/2 bg-gray-300 text-gray-800 py-2 rounded-xl hover:bg-gray-400 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              disabled={isSubmitting}
+              className="w-1/2 bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition disabled:opacity-50 flex justify-center items-center"
+              aria-busy={isSubmitting}
             >
-              Submit
+              {isSubmitting ? (
+                <Loader2 className="animate-spin w-5 h-5" />
+              ) : (
+                editData ? 'Update Offer Type' : 'Create Offer Type'
+              )}
             </button>
           </div>
         </form>
@@ -63,4 +113,3 @@ const Addoffertype = ({ onClose }) => {
 };
 
 export default Addoffertype;
- 

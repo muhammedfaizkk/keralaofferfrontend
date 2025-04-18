@@ -1,15 +1,19 @@
 import React from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 
-function Bannercard({ onDelete }) {
+function Bannercard({ banner, onDelete }) {
+  console.log('banner------->',banner);
+  
   return (
     <div className="relative group w-full max-w-sm rounded overflow-hidden shadow hover:shadow-lg transition duration-300">
+      {/* Display banner image */}
       <img
-        src="/assets/67b05dd93e0ad.jpeg"
-        alt="Banner"
+        src={`http://localhost:5001/uploads/${banner.bannerImage[0]}`} // Full path to the image
+        alt={banner.title || 'Banner'}
         className="w-full h-48 object-cover"
       />
-      <h3 className="text-lg font-semibold p-3">Headings</h3>
+
+      <h3 className="text-lg font-semibold p-3">{banner.title || 'No Title'}</h3>
 
       <button
         onClick={onDelete}
