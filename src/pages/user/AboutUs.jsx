@@ -1,156 +1,100 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
-import { FaLightbulb, FaProjectDiagram, FaChartLine, FaVial } from 'react-icons/fa';
-
+import { Play, ArrowLeft, ArrowRight } from 'lucide-react';
 import Header from '../../components/user/Header';
 
 const AboutUs = () => {
-  const navigate = useNavigate();
-
   return (
     <>
       <Header />
       <div className="bg-white text-gray-800 font-sans">
-        {/* About Us Heading */}
-        <div className="text-center py-12 bg-white font-nunlic">
-          <h1 className="text-5xl font-bold text-violet-800 uppercase ">
-            About Us
-          </h1>
-        </div>
-
         {/* Hero Section */}
-        <div className="relative bg-gradient-to-r from-violet-700 to-indigo-800 text-white py-16 px-4 text-left sm:text-center">
-          <h1 className="text-3xl sm:text-3xl md:text-4xl font-bold mb-4 leading-snug">
-            We help your business grow through powerful ad promotions
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg max-w-3xl mx-auto font-light">
-            Unlock your business potential with custom promotional strategies across Kerala and beyond. We make marketing effective and simple.
-          </p>
-        </div>
-
-        {/* Testimonial Section - Side-by-side always, even on mobile */}
-        <div className="bg-violet-600 text-white py-16 px-6 w-full">
-          <div className="max-w-4xl mx-auto flex items-center gap-4 sm:gap-6 text-left flex-row">
-            <div className="flex-shrink-0">
-              <img
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                alt="Alex Mathews"
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-4 border-white object-cover"
-              />
-            </div>
-            <div className="text-xs sm:text-sm md:text-base leading-relaxed">
-              <p className="italic mb-2">
-                "Working with <span className="font-semibold text-white">Ruffleyo</span> helped us realize projects that are creative and researchable.
-                Their work is always excellent — we enjoy how they build all the study cases and make them like a puzzle. Then, we have the product like magic."
-              </p>
-              <p className="text-[11px] sm:text-xs font-semibold uppercase text-white/80">
-                Alex Mathews — Founder of Creative Minds
-              </p>
-            </div>
+        <div className="relative min-h-[600px] bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+          <div className="absolute inset-0 bg-[url('/Images/about-bg.jpg')] bg-cover bg-center mix-blend-overlay opacity-30"></div>
+          <div className="relative max-w-6xl mx-auto px-4 py-20">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 max-w-2xl">
+              We combine data and technology for world-leading enterprise solutions
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mb-12">
+              Maximize Your Potential with Our Enterprise Technology Solutions.
+              Let us help you unlock the full potential of your business with our
+              innovative solutions.
+            </p>
+            
+            {/* Video Introduction Button */}
+            <button className="flex items-center gap-4 group">
+              <div className="w-14 h-14 rounded-full bg-coral-500 flex items-center justify-center group-hover:bg-coral-600 transition-colors">
+                <Play className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-medium">Know more about us</p>
+                <p className="text-sm text-gray-400">Introduction by Jeremilyn Fisher</p>
+              </div>
+            </button>
           </div>
         </div>
 
-        {/* Our Mission and Values Section */}
-        <div className="bg-gradient-to-r from-violet-700 to-indigo-800 text-white py-16 px-6">
-          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-start">
-            {/* Our Mission */}
-            <div>
-              <h2 className="text-3xl font-bold mb-4 font-jakarta">Our Mission</h2>
-              <p className="text-sm md:text-base font-light leading-relaxed text-white/90">
-                At Ruffleyo, our mission is to empower businesses across Kerala and beyond with innovative and results-driven advertising solutions.
-                We aim to simplify marketing while maximizing visibility and growth for every brand we work with.
-              </p>
-            </div>
-
-            {/* Our Values */}
-            <div>
-              <h2 className="text-3xl font-bold mb-4 font-jakarta">Our Values</h2>
-              <ul className="text-sm md:text-base font-light space-y-3 text-white/90">
-                <li>✅ Creativity: Delivering unique and engaging promotional ideas</li>
-                <li>✅ Integrity: Transparent and honest collaboration with our clients</li>
-                <li>✅ Results-Oriented: Driving measurable impact and growth</li>
-                <li>✅ Customer Focus: Personalized solutions tailored to your needs</li>
-              </ul>
+        {/* Testimonial Section */}
+        <div className="bg-violet-800 text-white py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex flex-col items-center text-center">
+              <blockquote className="text-2xl md:text-3xl lg:text-4xl font-light mb-8 max-w-4xl">
+                "Working with <span className="font-semibold">Rufflevo</span> helped us realize projects that are creative and
+                researchable. Their work is always excellent, we enjoy how they build all the
+                study cases and make them like a puzzle. Then, we have the product like magic"
+              </blockquote>
+              <div className="text-center">
+                <p className="font-semibold text-xl">Jacon Somber</p>
+                <p className="text-gray-300">Founder of Narina Studio</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Info Section */}
-        <div className="max-w-6xl mx-auto py-20 px-6 grid md:grid-cols-2 gap-10">
-          <div>
-            <h2 className="text-3xl font-bold text-violet-700 mb-6">Why Choose Us?</h2>
-            <ul className="space-y-4 text-gray-700">
-              <li>✅ Tailored promotional solutions for every business type</li>
-              <li>✅ Affordable, impactful ad placements</li>
-              <li>✅ Dedicated team with proven results</li>
-              <li>✅ Trusted by 200+ brands across Kerala</li>
-            </ul>
-          </div>
-
-          <div>
-            <img
-              src="https://i.pinimg.com/736x/2d/b5/b2/2db5b2884af57df10b2e448c4546b5ed.jpg"
-              alt="About Us Banner"
-              className="w-full h-80 object-cover rounded-xl shadow-md"
-            />
-          </div>
-        </div>
-
-        {/* Structured Business Model Section - With Icons */}
-        <div className="bg-gradient-to-r from-violet-700 to-indigo-800 py-16 px-6 w-full">
-          <div className="max-w-5xl mx-auto text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white font-jakarta">
-              They like how we structure their business models
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto text-gray-700">
-            <div className="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
-              <div className="text-violet-600 text-3xl">
-                <FaLightbulb />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-violet-600 mb-2">Define the strategy</h3>
-                <p className="text-sm font-light">
-                  A clear and well-defined strategy is essential for achieving success in business. It outlines goals and provides a roadmap for achieving them.
+        {/* Vision, Mission, and Values Section */}
+        <div className="bg-violet-800 py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Vision Card */}
+              <div className="bg-violet-900/50 p-8 rounded-lg">
+                <div className="w-12 h-12 bg-violet-700 rounded-lg flex items-center justify-center mb-6">
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">Our Vision</h3>
+                <p className="text-gray-300">
+                  To be the leading technology solutions provider, transforming businesses through innovative digital solutions and creating lasting value for our clients worldwide.
                 </p>
               </div>
-            </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
-              <div className="text-violet-600 text-3xl">
-                <FaProjectDiagram />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-violet-600 mb-2">Re-structure business model</h3>
-                <p className="text-sm font-light">
-                  Re-structuring can help you streamline operations, eliminate inefficiency, and drive growth. A strategic re-structure can be a powerful tool for success.
+              {/* Mission Card */}
+              <div className="bg-violet-900/50 p-8 rounded-lg">
+                <div className="w-12 h-12 bg-violet-700 rounded-lg flex items-center justify-center mb-6">
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">Our Mission</h3>
+                <p className="text-gray-300">
+                  To empower businesses with cutting-edge technology solutions that drive growth, efficiency, and innovation while maintaining the highest standards of quality and customer satisfaction.
                 </p>
               </div>
-            </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
-              <div className="text-violet-600 text-3xl">
-                <FaChartLine />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-violet-600 mb-2">Improve Performance</h3>
-                <p className="text-sm font-light">
-                  Improving performance is key to achieving success and enhancing the value of the business. There are many strategies that can help improve efficiency.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
-              <div className="text-violet-600 text-3xl">
-                <FaVial />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-violet-600 mb-2">Testing and evaluation</h3>
-                <p className="text-sm font-light">
-                  This results in higher quality outcomes, increased customer satisfaction, and the ability to compete in the changing marketplace.
-                </p>
+              {/* Values Card */}
+              <div className="bg-violet-900/50 p-8 rounded-lg">
+                <div className="w-12 h-12 bg-violet-700 rounded-lg flex items-center justify-center mb-6">
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">Our Values</h3>
+                <ul className="text-gray-300 space-y-2">
+                  <li>• Innovation & Excellence</li>
+                  <li>• Customer-Centric Approach</li>
+                  <li>• Integrity & Transparency</li>
+                  <li>• Continuous Improvement</li>
+                </ul>
               </div>
             </div>
           </div>
