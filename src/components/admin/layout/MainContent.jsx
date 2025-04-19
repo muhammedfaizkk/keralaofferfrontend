@@ -1,21 +1,24 @@
-import React from 'react';
-import FilterControls from '../dashboard/FilterControls';
+import React, { useEffect, useState } from 'react'; // ✅ include useEffect & useState
 import MetricCard from '../dashboard/MetricCard';
-import ChartCard from '../dashboard/ChartCard';
 import ActivityChart from '../dashboard/ActivityChart';
-import TopicsList from '../dashboard/TopicsList';
-import Leaderboard from '../dashboard/Leaderboard';
-import { Download } from 'lucide-react'; // ✅ Add this
-import { activityData } from '../../../data/mockData';
+import { Download } from 'lucide-react';
 import { useGetStore } from '../../../hooks/admin/Storehooks';
-
-// import { useGetStoreCount } from '../../../hooks/admin/Storehooks'; // if using separate hook
+import { useGetTotalAdImagesCount } from '../../../hooks/admin/Storeads';
+import { getVisitorsCount } from '../../../hooks/common/Visitorscount';
 
 const MainContent = () => {
-  const { stores, loading, error } = useGetStore(); // or useGetStoreCount
+  const { stores, loading, error } = useGetStore();
+  const { totalImages, loading: adImagesLoading, error: adImagesError } = useGetTotalAdImagesCount();
   const storeCount = stores?.length || 0;
+  const [visitorCount, setVisitorCount] = useState(0); // ✅ state for visitors
 
-  const visitorCount = 1524; // Replace with real analytics if available
+  useEffect(() => {
+    const fetchVisitorCount = async () => {
+      const count = await getVisitorsCount();
+      setVisitorCount(count);
+    };
+    fetchVisitorCount();
+  }, []);
 
   const chartData = [
     { name: 'Stores', value: storeCount },
@@ -32,16 +35,10 @@ const MainContent = () => {
         </button>
       </div>
 
-      {/* <FilterControls /> */}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <MetricCard title="Stores" value={storeCount} />
         <MetricCard title="Site Visitors" value={visitorCount} />
-        <MetricCard title="Av. Search Length" value="2m 34s" />
-        <MetricCard
-          title="Activity"
-          chart={<ActivityChart data={chartData} height={40} showAxis={false} />}
-        />
+        <MetricCard title="Aads" value={adImagesLoading ? 'Loading...' : totalImages} />
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-8">

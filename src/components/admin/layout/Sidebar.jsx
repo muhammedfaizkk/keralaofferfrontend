@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   FaStore, FaThLarge, FaUser, FaCog, FaChevronDown,
-  FaChevronUp, FaTimes, FaHome, FaSignOutAlt
+  FaChevronUp, FaTimes, FaHome, FaSignOutAlt, FaImages
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -86,6 +86,23 @@ const Sidebar = ({ isOpen, onClose }) => {
             {dropdowns.stores && (
               <div className="ml-10 transition-all duration-300 ease-in-out">
                 <div onClick={() => navigateTo('/admin/store')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Stores</div>
+              </div>
+            )}
+          </div>
+
+          {/* Banners */}
+          <div>
+            <div onClick={() => toggleDropdown('banners')} className="flex items-center justify-between p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
+              <div className="flex items-center">
+                <FaImages className="mr-3" />
+                <span>Banners</span>
+              </div>
+              {dropdowns.banners ? <FaChevronUp /> : <FaChevronDown />}
+            </div>
+            {dropdowns.banners && (
+              <div className="ml-10 transition-all duration-300 ease-in-out">
+                <div onClick={() => navigateTo('/admin/banners')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">All Banners</div>
+                
               </div>
             )}
           </div>

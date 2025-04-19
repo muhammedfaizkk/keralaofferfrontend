@@ -76,7 +76,62 @@ export const useUpdateStoreads = () => {
     return { updateStoreads, loading, error };
 };
 
-// DELETE Hook
+
+export const useGetTotalAdImagesCount = () => {
+    const [totalImages, setTotalImages] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchTotalAdImages = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await axiosInstance.get('/storeads/getTotalAdImagesCount');
+            setTotalImages(response.data.totalImages);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to fetch image count');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTotalAdImages();
+    }, []);
+
+    return { totalImages, loading, error, refetch: fetchTotalAdImages };
+};
+
+export const useGetAllAdsWithStore = () => {
+    const [adsWithStore, setAdsWithStore] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchAdsWithStore = async () => {
+        try {
+            const response = await axiosInstance.get('/storeads/adswithstore');
+            setAdsWithStore(response.data);
+        } catch (error) {
+            setError('Error fetching ads with store information');
+            console.error('Error fetching ads with store:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAdsWithStore();
+    }, []);
+
+    return {
+        adsWithStore,
+        loading,
+        error,
+        refetch: fetchAdsWithStore
+    };
+}
+
+
 export const useDeleteStoreads = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);

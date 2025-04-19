@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
-
     <Router>
       <ToastContainer
         position="top-center"
@@ -26,10 +25,6 @@ function App() {
         <Route path="/admin/*" element={<Admin />} />
       </Routes>
     </Router>
-
-
-
-
   );
 }
 

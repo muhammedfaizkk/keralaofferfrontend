@@ -56,23 +56,6 @@ function Stores() {
         <p className="text-gray-500 mt-1">Manage your store locations and details</p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-          <p className="text-blue-600 font-medium">Total Stores</p>
-          <h3 className="text-2xl font-bold">{stores?.length || 0}</h3>
-        </div>
-        <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-          <p className="text-green-600 font-medium">Active Stores</p>
-          <h3 className="text-2xl font-bold">{stores?.filter(s => s.active)?.length || 0}</h3>
-        </div>
-        <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
-          <p className="text-purple-600 font-medium">Locations</p>
-          <h3 className="text-2xl font-bold">{locations?.length || 0}</h3>
-        </div>
-      </div>
-
-      {/* Search & Actions Bar */}
       <div className="bg-gray-50 p-4 rounded-xl mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}

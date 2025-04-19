@@ -17,7 +17,7 @@ const Admin = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
     
-    {/* Wrap protected routes in element */}
+   
     <Route path="/" element={<Protected><AdminLayout /></Protected>}>
       <Route index element={<Dashboard />} />
       <Route path="profile" element={<Profile />} />
