@@ -4,13 +4,16 @@ import { useGetOffertypes, useGetstorecategory, useFetchDistricts, useGetLocatio
 
 function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
   const [dropdownOpen, setDropdownOpen] = useState(null);
-  const [selectedValues, setSelectedValues] = useState({});  // Reset to empty object
-  const [searchQuery, setSearchQuery] = useState('');  // Reset to empty string
+  const [selectedValues, setSelectedValues] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
-
-  // Custom hooks to fetch filter data
+  
+  const keys = Object.keys(selectedValues);
+const label = keys.length > 0 ? selectedValues[keys[0]]?.label : null;
+console.log(label);
+  
   const { offertypes, loading: offerTypesLoading } = useGetOffertypes();
   const { categories, loading: categoriesLoading } = useGetstorecategory();
   const { districts, loading: districtsLoading } = useFetchDistricts();
@@ -19,42 +22,46 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
 
   // Process API responses to handle complex objects
   const processData = (data, type) => {
-    if (!data || !Array.isArray(data)) return [];
+    if (!data) return [];
+    
+    // Handle cases where data might be nested in a 'data' property
+    const rawData = Array.isArray(data) ? data : (data.data || []);
+    
+    if (!Array.isArray(rawData)) return [];
     
     switch(type) {
       case 'offertypes':
-        const offerTypesArray = data.data || data;
-        return offerTypesArray.map(item => ({
-          id: item._id,
-          label: item.title,
+        return rawData.map(item => ({
+          id: item._id || item.id,
+          label: item.title || item.offerType,
           originalData: item
         }));
 
       case 'categories':
-        return data.map(item => ({
-          id: item._id,
-          label: item.title,
+        return rawData.map(item => ({
+          id: item._id || item.id,
+          label: item.title || item.category,
           originalData: item
         }));
 
       case 'districts':
-        return data.map(item => ({
+        return rawData.map(item => ({
           id: item.id || String(Math.random()),
-          label: item.title,
+          label: item.title || item.district,
           originalData: item
         }));
 
       case 'locations':
-        return data.map(item => ({
-          id: item._id,
-          label: item.locationName,
+        return rawData.map(item => ({
+          id: item._id || item.id,
+          label: item.locationName || item.location,
           district: item.district,
           originalData: item
         }));
 
       case 'stores':
-        return data.map(item => ({
-          id: item._id,
+        return rawData.map(item => ({
+          id: item._id || item.id,
           label: item.storeName,
           originalData: item
         }));
@@ -64,11 +71,11 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
     }
   };
 
-  const processedStoreNames = React.useMemo(() => processData(storeNames, 'stores'), [storeNames]);
-  const processedCategories = React.useMemo(() => processData(categories, 'categories'), [categories]);
-  const processedDistricts = React.useMemo(() => processData(districts, 'districts'), [districts]);
-  const processedLocations = React.useMemo(() => processData(locations, 'locations'), [locations]);
-  const processedOfferTypes = React.useMemo(() => processData(offertypes, 'offertypes'), [offertypes]);
+  const processedStoreNames = useMemo(() => processData(storeNames, 'stores'), [storeNames]);
+  const processedCategories = useMemo(() => processData(categories, 'categories'), [categories]);
+  const processedDistricts = useMemo(() => processData(districts, 'districts'), [districts]);
+  const processedLocations = useMemo(() => processData(locations, 'locations'), [locations]);
+  const processedOfferTypes = useMemo(() => processData(offertypes, 'offertypes'), [offertypes]);
 
   const dropdownItems = useMemo(() => [
     { 
@@ -164,7 +171,6 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
     });
 
     setSelectedValues(prevValues => {
-      // Only update if the values are different
       const hasChanges = Object.keys(validFilters).some(key => 
         prevValues[key]?.id !== validFilters[key]?.id ||
         prevValues[key]?.label !== validFilters[key]?.label
@@ -222,7 +228,10 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
     setSelectedValues(newValues);
     setDropdownOpen(null);
     
-    onFilterChange?.(newValues);
+    onFilterChange?.({
+      ...newValues,
+      searchQuery
+    });
   };
 
   const clearFilter = (label) => {

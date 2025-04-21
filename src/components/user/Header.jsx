@@ -29,7 +29,7 @@ const Header = () => {
             </div>
 
             {/* Mobile Search Input - visible only on mobile screens */}
-            <div className="block sm:hidden flex-1 px-2">
+            {/* <div className="block sm:hidden flex-1 px-2">
               <div className="flex items-center bg-gray-100 rounded-md px-3 py-2 w-full h-[42px]">
                 <Search className="min-w-[17px] min-h-[17px] text-gray-400" />
                 <input
@@ -38,7 +38,7 @@ const Header = () => {
                   className="bg-transparent outline-none text-sm text-gray-600 w-full ml-2"
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex gap-2 font-medium font-mluvka sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
