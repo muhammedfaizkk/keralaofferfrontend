@@ -342,7 +342,7 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
   }
 
   return (
-    <div className="w-full sticky top-0 bg-white/95 backdrop-blur-sm z-50 mt-4 px-2 sm:px-4 transition-all duration-300">
+    <div className="w-full  top-0 bg-white/95 backdrop-blur-sm z-50 mt-4  sm:px-4 transition-all duration-300">
       <div
         className={`border border-gray-200 rounded-xl shadow-lg bg-white transition-all duration-300 
         ${isCollapsed ? "py-2" : "py-4"}`}
@@ -452,7 +452,7 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
                         </button>
 
                         {dropdownOpen === item.label && (
-                          <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-xl w-full min-w-[200px] max-h-[300px] overflow-y-auto border border-gray-200 z-50">
+                          <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-xl w-full min-w-[150px] max-h-[300px] overflow-y-auto border border-gray-200 z-50">
                             <div className="sticky top-0 bg-gray-50/80 backdrop-blur-sm border-b border-gray-200 px-3 py-2">
                               <input
                                 type="text"
