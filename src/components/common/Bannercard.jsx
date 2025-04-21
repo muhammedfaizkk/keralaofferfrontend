@@ -8,7 +8,7 @@ function Bannercard({ banner, onDelete }) {
     <div className="relative group w-full max-w-sm rounded overflow-hidden shadow hover:shadow-lg transition duration-300">
       {/* Display banner image */}
       <img
-        src={`http://localhost:5001/uploads/${banner.bannerImage[0]}`} // Full path to the image
+        src={`${banner.bannerImage[0]}`} // Full path to the image
         alt={banner.title || 'Banner'}
         className="w-full h-48 object-cover"
       />

@@ -88,24 +88,7 @@ function Navbar() {
 
       {/* Desktop Footer */}
       <footer className="hidden md:flex flex-col items-center w-full py-4 bg-gray-50 text-gray-600 text-sm border-t border-gray-200">
-        <div className="mb-2 flex space-x-4">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <button
-                key={item.key}
-                onClick={() => item.type === 'share' ? handleShare() : navigate(item.path)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-purple-100 text-purple-600 font-medium' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
+        
         <p className="text-center">
           © {new Date().getFullYear()} Kerala Offer. All rights reserved.
         </p>

@@ -1,111 +1,105 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OfferCard from './OfferCard';
-
-const initialOffers = [
-  {
-    id: 1,
-    image: "Images/offer1.png",
-    category: "Fashion",
-    title: "CMR OFFER",
-    liked: true,
-    discountText: "25% OFF Premium Spa Hair"
-  },
-  {
-    id: 2,
-    image: "Images/offer2.png",
-    category: "Home",
-    title: "50% OFFER",
-    liked: true,
-    discountText: "50% OFF Home Decor items"
-  },
-  {
-    id: 3,
-    image: "Images/offer3.png",
-    category: "Women",
-    title: "SARI COLECTION",
-    liked: true,
-    discountText: "20% OFF on Sari Collections"
-  },
-  {
-    id: 4,
-    image: "Images/offer4.png",
-    category: "Women",
-    title: "HOLI OFFER",
-    liked: false,
-    discountText: "30% OFF on Holi Special"
-  },
-  {
-    id: 5,
-    image: "Images/offer1.png",
-    category: "Men",
-    title: "SUMMER DEAL",
-    liked: false,
-    discountText: "15% OFF Summer Apparel"
-  },
-  {
-    id: 6,
-    image: "Images/offer2.png",
-    category: "Kids",
-    title: "TRENDY OFFER",
-    liked: true,
-    discountText: "10% OFF Trendy Kidswear"
-  },
-  {
-    id: 7,
-    image: "Images/offer1.png",
-    category: "Men",
-    title: "SUMMER DEAL",
-    liked: false,
-    discountText: "15% OFF Summer Apparel"
-  },
-  {
-    id: 8,
-    image: "Images/offer2.png",
-    category: "Kids",
-    title: "TRENDY OFFER",
-    liked: true,
-    discountText: "10% OFF Trendy Kidswear"
-  },
-];
+import { useFetchAds } from '../../hooks/user/Userads';
+import { toast } from 'react-toastify';
 
 function OfferSection() {
-  const [offers] = useState(initialOffers);
+  const { ads, loading, error } = useFetchAds();
   const navigate = useNavigate();
+  const [likedOffers, setLikedOffers] = useState({});
+  const [filteredAds, setFilteredAds] = useState([]);
 
-  const copyLink = (id) => {
-    const url = `${window.location.origin}/offer/${id}`;
-    navigator.clipboard.writeText(url).then(() => {
-      alert("Link copied to clipboard!");
-    }).catch((err) => {
-      console.error("Failed to copy link", err);
-    });
+  // Filter out expired offers and sort by end date
+  useEffect(() => {
+    if (ads) {
+      const validAds = ads
+        .filter(ad => new Date(ad.endDate) > new Date()) // Only show active offers
+        .sort((a, b) => new Date(a.endDate) - new Date(b.endDate)); // Sort by end date
+      setFilteredAds(validAds);
+    }
+  }, [ads]);
+
+  const handleOfferClick = (adId) => {
+    navigate(`/offer/${adId}`);
+  };
+
+  const toggleLike = (adId) => {
+    setLikedOffers(prev => ({
+      ...prev,
+      [adId]: !prev[adId]
+    }));
+  };
+
+  const handleCopyLink = (adId) => {
+    const offerUrl = `${window.location.origin}/offer/${adId}`;
+    navigator.clipboard.writeText(offerUrl)
+      .then(() => {
+        toast.success('Offer link copied to clipboard!');
+      })
+      .catch((error) => {
+        console.error('Failed to copy link:', error);
+        toast.error('Failed to copy link. Please try again.');
+      });
   };
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-0 md:px-6 py-8 font-poppins">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-[16px] sm:text-[18px] md:text-[20px] font-medium text-[#231F20]" style={{ fontFamily: 'Inter' }}>
-          Offers Now!
+        <h2 className="text-[20px] sm:text-[24px] md:text-[28px] font-semibold text-gray-900">
+          Latest Offers
         </h2>
         <button
-          onClick={() => navigate('/offer')}
-          className="text-[14px] sm:text-[16px] font-semibold text-[#EE5F73]"
-          style={{ fontFamily: 'Inter', textAlign: 'right' }}
+          onClick={() => navigate('/offers')}
+          className="text-[14px] sm:text-[16px] font-medium text-violet-600 hover:text-violet-700 transition-colors"
         >
-          See More
+          View All Offers
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 pb-10">
-        {offers.map((offer) => (
-          <OfferCard 
-            key={offer.id} 
-            offer={offer} 
-            onCopyLink={copyLink}
-          />
-        ))}
-      </div>
+      {loading && (
+        <div className="flex justify-center items-center h-40">
+          <div className="animate-pulse text-[16px] text-gray-500">Loading offers...</div>
+        </div>
+      )}
+
+      {error && (
+        <div className="flex justify-center items-center h-40">
+          <div className="text-[16px] text-red-500">{error}</div>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <>
+          {filteredAds.length === 0 ? (
+            <div className="flex justify-center items-center h-40">
+              <div className="text-[16px] text-gray-500 text-center">No active offers available.</div>
+            </div>
+          ) : (
+            <>
+              <div className="text-[14px] text-gray-600 mb-4 text-right">
+                Showing {Math.min(filteredAds.length, 8)} of {filteredAds.length} Offers
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 pb-10">
+                {filteredAds.slice(0, 8).map((ad) => (
+                  <OfferCard
+                    key={ad._id}
+                    offer={{
+                      ...ad,
+                      image: ad.adsImages?.[0],
+                      store: ad.storeId
+                    }}
+                    isLiked={likedOffers[ad._id]}
+                    onLikeToggle={() => toggleLike(ad._id)}
+                    onClick={() => handleOfferClick(ad._id)}
+                    onCopyLink={() => handleCopyLink(ad._id)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ const User = () => (
     <Route element={<UserLayout />}>
       <Route index element={<Home />} />
       <Route path="offers" element={<Offers />} />
-      <Route path="offer/:id" element={<InnerPage />} />
+      <Route path="offerdetails/:id" element={<InnerPage />} />
       <Route path="contactus" element={<ContactUs />} />
       <Route path="aboutus" element={<AboutUs />} />
     </Route>

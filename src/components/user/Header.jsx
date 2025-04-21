@@ -94,7 +94,7 @@ const Header = () => {
       {/* Conditionally render SearchFilters based on menu state */}
       {!menuOpen && (
         <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
-          <SearchFilters />
+          {/* <SearchFilters /> */}
         </div>
       )}
     </>
