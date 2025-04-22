@@ -32,7 +32,7 @@ function OfferSection() {
   };
 
   const handleCopyLink = (adId) => {
-    const offerUrl = `${window.location.origin}/offer/${adId}`;
+    const offerUrl = `${window.location.origin}/offerdetails/${adId}`;
     navigator.clipboard.writeText(offerUrl)
       .then(() => {
         toast.success('Offer link copied to clipboard!');

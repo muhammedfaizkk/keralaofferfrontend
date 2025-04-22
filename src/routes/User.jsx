@@ -6,17 +6,23 @@ import InnerPage from '../pages/user/InnerPage';
 import ContactUs from '../pages/user/ContactUs';
 import AboutUs from '../pages/user/AboutUs';
 import Offers from '../pages/user/Offers';
+import Footer from '../components/user/Footer';
 
 const User = () => (
-  <Routes>
-    <Route element={<UserLayout />}>
-      <Route index element={<Home />} />
-      <Route path="offers" element={<Offers />} />
-      <Route path="offerdetails/:id" element={<InnerPage />} />
-      <Route path="contactus" element={<ContactUs />} />
-      <Route path="aboutus" element={<AboutUs />} />
-    </Route>
-  </Routes>
+  <>
+    <Routes>
+      <Route element={<UserLayout />}>
+        <Route index element={<Home />} />
+        <Route path="offers" element={<Offers />} />
+        <Route path="offerdetails/:id" element={<InnerPage />} />
+        <Route path="contactus" element={<ContactUs />} />
+        <Route path="aboutus" element={<AboutUs />} />
+
+      </Route>
+
+    </Routes>
+    <Footer />
+  </>
 );
 
 export default User;

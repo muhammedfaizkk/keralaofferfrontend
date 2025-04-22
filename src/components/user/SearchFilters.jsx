@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
-import { Search, ChevronDown, X, Filter, RefreshCw } from "lucide-react"
+import { Search, ChevronDown, X, Filter, RefreshCw, Share2 } from "lucide-react"
 import {
   useGetOffertypes,
   useGetstorecategory,
@@ -10,11 +10,12 @@ import {
   useGetallstorenames,
 } from "../../hooks/user/Filtershook"
 
-function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
+function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initialFilters = {} }) {
   const [dropdownOpen, setDropdownOpen] = useState(null)
   const [selectedValues, setSelectedValues] = useState({})
   const [searchQuery, setSearchQuery] = useState("")
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
   const [dropdownSearchQueries, setDropdownSearchQueries] = useState({})
   const dropdownRef = useRef(null)
   const searchInputRef = useRef(null)
@@ -24,6 +25,24 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
   const { districts, loading: districtsLoading } = useFetchDistricts()
   const { locations, loading: locationsLoading } = useGetLocations()
   const { storeNames, loading: storesLoading } = useGetallstorenames()
+
+  // Check if screen is mobile
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768) // md breakpoint in Tailwind is 768px
+    }
+
+    // Initial check
+    checkIfMobile()
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIfMobile)
+
+    // Clean up
+    return () => window.removeEventListener("resize", checkIfMobile)
+  }, [])
 
   // Process API responses to handle complex objects
   const processData = (data, type) => {
@@ -199,6 +218,11 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
     }
   }
 
+  // Toggle mobile filters
+  const toggleMobileFilters = () => {
+    setIsMobileFiltersOpen(!isMobileFiltersOpen)
+  }
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -219,6 +243,7 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
       }
       if (e.key === "Escape") {
         setDropdownOpen(null)
+        setIsMobileFiltersOpen(false)
         if (document.activeElement === searchInputRef.current) {
           searchInputRef.current.blur()
         }
@@ -342,190 +367,239 @@ function SearchFilters({ onFilterChange, totalResults, initialFilters = {} }) {
   }
 
   return (
-    <div className="w-full  top-0 bg-white/95 backdrop-blur-sm z-50 mt-4  sm:px-4 transition-all duration-300">
-      <div
-        className={`border border-gray-200 rounded-xl shadow-lg bg-white transition-all duration-300 
-        ${isCollapsed ? "py-2" : "py-4"}`}
-      >
-        {/* Collapse/Expand Header */}
-        <div className="px-3 sm:px-6 flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none"
-              aria-label={isCollapsed ? "Expand filters" : "Collapse filters"}
-            >
-              <Filter className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
-            </button>
-            <div className="flex items-center gap-2">
-              <h3 className="font-medium text-gray-800">Filters</h3>
-              {getActiveFiltersCount() > 0 && (
-                <span className="bg-violet-100 text-violet-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                  {getActiveFiltersCount()}
-                </span>
-              )}
-            </div>
-          </div>
+    <div>
+      <div className="fixed top-28 left-4 z-50 flex flex-col gap-2">
 
-          {getActiveFiltersCount() > 0 && (
-            <button
-              onClick={clearAllFilters}
-              className="flex items-center gap-2 text-sm text-violet-600 hover:text-violet-800 focus:outline-none"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline">Clear all</span>
-            </button>
-          )}
-        </div>
+        {/* Filter Toggle Button */}
+        <button
+          onClick={isMobile ? toggleMobileFilters : () => setIsCollapsed(!isCollapsed)}
+          className="sm:hidden bg-white border border-violet-200 text-gray-600 hover:text-violet-700 hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 p-2 rounded-full shadow transition-all duration-300"
+          aria-label={
+            isMobile
+              ? isMobileFiltersOpen
+                ? "Close filters"
+                : "Open filters"
+              : isCollapsed
+                ? "Expand filters"
+                : "Collapse filters"
+          }
+        >
+          <Filter
+            className={`w-5 h-5 transition-transform duration-300 ${(isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed)
+                ? "text-violet-600 rotate-180"
+                : ""
+              }`}
+          />
+        </button>
 
-        {!isCollapsed && (
-          <>
-            {/* Filter Chips */}
-            {Object.keys(selectedValues).length > 0 && (
-              <div className="px-3 sm:px-6 flex flex-wrap gap-2 mb-4">{renderFilterChips()}</div>
-            )}
+        {/* Share Filters Button */}
+        <button
+          onClick={handleShareFilters}
+          className="sm:hidden bg-white border border-violet-200 text-gray-600 hover:text-violet-700 hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 p-2 rounded-full shadow transition-all duration-300"
+        >
+          <Share2 className={`w-5 h-5 transition-transform duration-300 ${(isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed)
+              ? "text-violet-600 rotate-180"
+              : ""
+            }`} />
 
-            {/* Search and Dropdowns */}
-            <div className="px-3 sm:px-6">
-              <div className="flex flex-col gap-3">
-                {/* Search Input */}
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    placeholder="Search offers, stores, categories... (Ctrl + K)"
-                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg 
-                      focus:ring-2 focus:ring-violet-300 focus:border-violet-400 transition-colors"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => {
-                        setSearchQuery("")
-                        onFilterChange?.({ ...selectedValues, searchQuery: "" })
-                      }}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      aria-label="Clear search"
-                    >
-                      <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                    </button>
+        </button>
+      </div>
+
+      {/* Hide the entire container on mobile unless the filter button is clicked */}
+      {(!isMobile || (isMobile && isMobileFiltersOpen)) && (
+        <div className="w-full bg-white rounded-xl shadow-sm">
+          <div
+            className={`border border-gray-200 rounded-xl bg-white transition-all duration-300 
+          ${isCollapsed ? "py-2" : "py-4"}`}
+          >
+            <div className="px-3 sm:px-6 flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  {getActiveFiltersCount() > 0 && (
+                    <span className="bg-violet-100 text-violet-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                      {getActiveFiltersCount()}
+                    </span>
                   )}
                 </div>
-
-                {/* Filter Dropdowns */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" ref={dropdownRef}>
-                  {dropdownItems.map((item) => {
-                    // Apply filtering logic for dependent dropdowns
-                    let filteredData = item.data
-                    if (item.filterBy) {
-                      filteredData = item.data.filter((option) => item.filterBy(option, selectedValues))
-                    }
-
-                    return (
-                      <div key={item.id} className="relative">
-                        <button
-                          onClick={() => toggleDropdown(item.label)}
-                          disabled={item.loading}
-                          className={`flex items-center justify-between gap-2 border rounded-lg px-3 py-2.5 text-sm w-full
-                            ${
-                              selectedValues[item.label]
-                                ? "bg-violet-50 border-violet-300 text-violet-700"
-                                : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
-                            }
-                            ${item.loading ? "opacity-50 cursor-not-allowed" : ""}
-                            transition-all duration-200`}
-                          aria-expanded={dropdownOpen === item.label}
-                          aria-haspopup="listbox"
-                        >
-                          <span className="flex items-center gap-2 truncate">
-                            <span className="text-base">{item.icon}</span>
-                            <span className="truncate">{selectedValues[item.label]?.label || item.label}</span>
-                          </span>
-                          <ChevronDown
-                            className={`w-4 h-4 transition-transform duration-200 
-                              ${dropdownOpen === item.label ? "rotate-180" : ""}`}
-                          />
-                        </button>
-
-                        {dropdownOpen === item.label && (
-                          <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-xl w-full min-w-[150px] max-h-[300px] overflow-y-auto border border-gray-200 z-50">
-                            <div className="sticky top-0 bg-gray-50/80 backdrop-blur-sm border-b border-gray-200 px-3 py-2">
-                              <input
-                                type="text"
-                                placeholder={`Search ${item.label.toLowerCase()}...`}
-                                className="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-violet-400"
-                                onClick={(e) => e.stopPropagation()}
-                                value={dropdownSearchQueries[item.label] || ""}
-                                onChange={(e) => handleDropdownSearchChange(e, item.label)}
-                                autoFocus
-                              />
-                            </div>
-
-                            <div className="py-1">
-                              {item.loading ? (
-                                <div className="px-4 py-3 text-sm text-gray-500 italic flex items-center justify-center">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
-                                    Loading...
-                                  </div>
-                                </div>
-                              ) : filteredData.length > 0 ? (
-                                getFilteredOptions(item.label, filteredData).map((option) => (
-                                  <button
-                                    key={option.id}
-                                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-violet-50 cursor-pointer
-                                      ${
-                                        selectedValues[item.label]?.id === option.id
-                                          ? "bg-violet-100 text-violet-700 font-medium"
-                                          : "text-gray-700"
-                                      }
-                                      flex items-center justify-between`}
-                                    onClick={() => handleSelect(item.label, option)}
-                                    role="option"
-                                    aria-selected={selectedValues[item.label]?.id === option.id}
-                                  >
-                                    <span className="truncate">{option.label}</span>
-                                    {selectedValues[item.label]?.id === option.id && (
-                                      <span className="text-violet-500">✓</span>
-                                    )}
-                                  </button>
-                                ))
-                              ) : (
-                                <div className="px-4 py-3 text-sm text-gray-500 italic text-center">
-                                  No options available
-                                </div>
-                              )}
-
-                              {filteredData.length > 0 && getFilteredOptions(item.label, filteredData).length === 0 && (
-                                <div className="px-4 py-3 text-sm text-gray-500 italic text-center">
-                                  No matching results
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
               </div>
+
+              {getActiveFiltersCount() > 0 && (
+                <button
+                  onClick={clearAllFilters}
+                  className="flex items-center gap-2 text-sm text-violet-600 hover:text-violet-800 focus:outline-none"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span className="hidden sm:inline">Clear all</span>
+                </button>
+              )}
             </div>
 
-            {/* Results count */}
-            {totalResults !== undefined && (
-              <div className="px-3 sm:px-6 mt-4 text-sm text-gray-600">
-                <span>
-                  {totalResults} result{totalResults !== 1 ? "s" : ""} found
+            {/* Only show all filters content on desktop OR when mobile filters are open */}
+            {(!isMobile && !isCollapsed) || (isMobile && isMobileFiltersOpen) ? (
+              <>
+                {/* Filter Chips */}
+                {Object.keys(selectedValues).length > 0 && (
+                  <div className="px-3 sm:px-6 flex flex-wrap gap-2 mb-4">{renderFilterChips()}</div>
+                )}
+
+                {/* Search and Dropdowns */}
+                <div className="px-3 sm:px-6">
+                  <div className="flex flex-col gap-3">
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        placeholder="Search offers, stores, categories... (Ctrl + K)"
+                        className="block w-full pl-10 pr-10 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg 
+                        focus:ring-2 focus:ring-violet-300 focus:border-violet-400 transition-colors"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => {
+                            setSearchQuery("")
+                            onFilterChange?.({ ...selectedValues, searchQuery: "" })
+                          }}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          aria-label="Clear search"
+                        >
+                          <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Filter Dropdowns */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" ref={dropdownRef}>
+                      {dropdownItems.map((item) => {
+                        // Apply filtering logic for dependent dropdowns
+                        let filteredData = item.data
+                        if (item.filterBy) {
+                          filteredData = item.data.filter((option) => item.filterBy(option, selectedValues))
+                        }
+
+                        return (
+                          <div key={item.id} className="relative">
+                            <button
+                              onClick={() => toggleDropdown(item.label)}
+                              disabled={item.loading}
+                              className={`flex items-center justify-between gap-2 border rounded-lg px-3 py-2.5 text-sm w-full
+                              ${selectedValues[item.label]
+                                  ? "bg-violet-50 border-violet-300 text-violet-700"
+                                  : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
+                                }
+                              ${item.loading ? "opacity-50 cursor-not-allowed" : ""}
+                              transition-all duration-200`}
+                              aria-expanded={dropdownOpen === item.label}
+                              aria-haspopup="listbox"
+                            >
+                              <span className="flex items-center gap-2 truncate">
+                                <span className="text-base">{item.icon}</span>
+                                <span className="truncate">{selectedValues[item.label]?.label || item.label}</span>
+                              </span>
+                              <ChevronDown
+                                className={`w-4 h-4 transition-transform duration-200 
+                                ${dropdownOpen === item.label ? "rotate-180" : ""}`}
+                              />
+                            </button>
+
+                            {dropdownOpen === item.label && (
+                              <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-xl w-full min-w-[150px] max-h-[300px] overflow-y-auto border border-gray-200 z-50">
+                                <div className="sticky top-0 bg-gray-50/80 backdrop-blur-sm border-b border-gray-200 px-3 py-2">
+                                  <input
+                                    type="text"
+                                    placeholder={`Search ${item.label.toLowerCase()}...`}
+                                    className="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-violet-400"
+                                    onClick={(e) => e.stopPropagation()}
+                                    value={dropdownSearchQueries[item.label] || ""}
+                                    onChange={(e) => handleDropdownSearchChange(e, item.label)}
+                                    autoFocus
+                                  />
+                                </div>
+
+                                <div className="py-1">
+                                  {item.loading ? (
+                                    <div className="px-4 py-3 text-sm text-gray-500 italic flex items-center justify-center">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+                                        Loading...
+                                      </div>
+                                    </div>
+                                  ) : filteredData.length > 0 ? (
+                                    getFilteredOptions(item.label, filteredData).map((option) => (
+                                      <button
+                                        key={option.id}
+                                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-violet-50 cursor-pointer
+                                        ${selectedValues[item.label]?.id === option.id
+                                            ? "bg-violet-100 text-violet-700 font-medium"
+                                            : "text-gray-700"
+                                          }
+                                        flex items-center justify-between`}
+                                        onClick={() => handleSelect(item.label, option)}
+                                        role="option"
+                                        aria-selected={selectedValues[item.label]?.id === option.id}
+                                      >
+                                        <span className="truncate">{option.label}</span>
+                                        {selectedValues[item.label]?.id === option.id && (
+                                          <span className="text-violet-500">✓</span>
+                                        )}
+                                      </button>
+                                    ))
+                                  ) : (
+                                    <div className="px-4 py-3 text-sm text-gray-500 italic text-center">
+                                      No options available
+                                    </div>
+                                  )}
+
+                                  {filteredData.length > 0 &&
+                                    getFilteredOptions(item.label, filteredData).length === 0 && (
+                                      <div className="px-4 py-3 text-sm text-gray-500 italic text-center">
+                                        No matching results
+                                      </div>
+                                    )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Results count */}
+                {totalResults !== undefined && (
+                  <div className="px-3 sm:px-6 mt-4 text-sm text-gray-600">
+                    <span>
+                      {totalResults} result{totalResults !== 1 ? "s" : ""} found
+                    </span>
+                  </div>
+                )}
+              </>
+            ) : null}
+
+            {/* Show applied filters count on mobile when collapsed */}
+            {isMobile && !isMobileFiltersOpen && getActiveFiltersCount() > 0 && (
+              <div className="px-3 text-sm text-gray-600 mt-1">
+                <span className="text-violet-600 font-medium">
+                  {getActiveFiltersCount()} filter{getActiveFiltersCount() !== 1 ? "s" : ""} applied
                 </span>
               </div>
             )}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
+
+      {/* Show filter count badge when filters are hidden on mobile */}
+      {isMobile && !isMobileFiltersOpen && getActiveFiltersCount() > 0 && (
+        <div className="mt-2 text-sm text-violet-600 font-medium">
+          {getActiveFiltersCount()} filter{getActiveFiltersCount() !== 1 ? "s" : ""} applied
+        </div>
+      )}
     </div>
   )
 }

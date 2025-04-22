@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Menu, Search, X } from "lucide-react";
 import { Link } from 'react-router-dom';
-import SearchFilters from './SearchFilters';
+
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);

@@ -6,7 +6,6 @@ import Header from "../../components/user/Header"
 import OfferCard from "../../components/user/OfferCard"
 import SearchFilters from "../../components/user/SearchFilters"
 import { useFetchAds } from "../../hooks/user/Userads"
-import { Share2 } from "lucide-react"
 import { toast } from "react-toastify"
 
 const Offers = () => {
@@ -156,7 +155,7 @@ const Offers = () => {
   }
 
   const handleCopyLink = (adId) => {
-    const offerUrl = `${window.location.origin}/offer/${adId}`
+    const offerUrl = `${window.location.origin}/offerdetails/${adId}`
     navigator.clipboard
       .writeText(offerUrl)
       .then(() => {
@@ -173,14 +172,19 @@ const Offers = () => {
       <Header />
 
       <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
-        <SearchFilters onFilterChange={handleFilterChange} totalResults={filteredAds.length} initialFilters={filters} />
+        <SearchFilters
+          onFilterChange={handleFilterChange}
+          totalResults={filteredAds.length}
+          initialFilters={filters}
+          handleShareFilters={handleShareFilters}
+        />
 
         <div className="py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
             <h1 className="text-[24px] sm:text-[28px] lg:text-[32px] font-semibold text-gray-900 text-center sm:text-left">
               Latest Offers
             </h1>
-            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
+            {/* <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
               <button
                 onClick={handleShareFilters}
                 className="flex items-center gap-2 px-4 py-2.5 text-[14px] font-medium text-violet-600 bg-violet-50 rounded-lg hover:bg-violet-100 transition-colors"
@@ -197,12 +201,16 @@ const Offers = () => {
                 />
                 Show expired offers
               </label>
-            </div>
+            </div> */}
           </div>
 
           {adsLoading && (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-pulse text-[16px] text-gray-500">Loading offers...</div>
+            <div className="min-h-screen bg-gray-100 font-poppins">
+              <div className="max-w-6xl mx-auto px-4 py-8">
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-600"></div>
+                </div>
+              </div>
             </div>
           )}
 

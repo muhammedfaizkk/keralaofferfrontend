@@ -5,10 +5,13 @@ import { FaLink, FaCalendarAlt, FaClock, FaStore, FaMapMarkerAlt } from "react-i
 const OfferCard = ({ offer, onCopyLink }) => {
   const navigate = useNavigate();
 
-  // Check if offer is expired
+  // ✅ Guard clause to prevent undefined offer access
+  if (!offer || !offer.endDate) return null;
+
+  // ✅ Check if offer is expired
   const isExpired = new Date(offer.endDate) < new Date();
 
-  // Format dates
+  // ✅ Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-IN', {
@@ -18,7 +21,7 @@ const OfferCard = ({ offer, onCopyLink }) => {
     });
   };
 
-  // Calculate remaining time
+  // ✅ Get remaining time
   const getRemainingTime = () => {
     const now = new Date();
     const endDate = new Date(offer.endDate);
@@ -40,10 +43,11 @@ const OfferCard = ({ offer, onCopyLink }) => {
 
   const remainingTime = getRemainingTime();
 
+  // ✅ Don’t render if offer is expired
   if (isExpired) return null;
 
   return (
-    <div 
+    <div
       className={`group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer
         ${remainingTime === 'Ending soon' ? 'ring-2 ring-red-400' : ''}`}
       onClick={handleOfferClick}
@@ -58,7 +62,7 @@ const OfferCard = ({ offer, onCopyLink }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
 
-        {/* Store info overlay */}
+        {/* Store Info */}
         <div className="absolute bottom-2 left-2 right-2 text-white">
           <div className="flex items-center gap-2 mb-1">
             <FaStore className="w-3 h-3" />
@@ -69,17 +73,17 @@ const OfferCard = ({ offer, onCopyLink }) => {
           <div className="flex items-center gap-2 text-xs opacity-90">
             <FaMapMarkerAlt className="w-3 h-3" />
             <span className="truncate">
-              {offer.store?.location}, {offer.store?.district}
+              {offer.store?.location || 'Unknown Location'}, {offer.store?.district || ''}
             </span>
           </div>
         </div>
 
-        {/* Copy Link Icon */}
+        {/* Copy Link */}
         <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            onCopyLink(offer._id);
+            onCopyLink?.(offer._id);
           }}
           className="absolute top-2 right-2 z-10 transform hover:scale-110 transition-all duration-200"
         >
@@ -88,11 +92,11 @@ const OfferCard = ({ offer, onCopyLink }) => {
           </div>
         </button>
 
-        {/* Time remaining badge */}
+        {/* Remaining Time */}
         {remainingTime && (
           <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium
-            ${remainingTime === 'Ending soon' 
-              ? 'bg-red-500 text-white' 
+            ${remainingTime === 'Ending soon'
+              ? 'bg-red-500 text-white'
               : 'bg-white/90 text-gray-700'}`}>
             <div className="flex items-center gap-1">
               <FaClock className="w-3 h-3" />
@@ -103,40 +107,40 @@ const OfferCard = ({ offer, onCopyLink }) => {
       </div>
 
       <div className="p-4">
-        {/* Offer Type and Description */}
+        {/* Offer Details */}
         <div className="flex flex-col gap-2 mb-3">
           <div className="flex items-center justify-between">
             <span className="px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-medium tracking-wide">
               {offer.offerType}
             </span>
             <span className="text-xs text-gray-500">
-              {offer.store?.category}
+              {offer.store?.category || ''}
             </span>
           </div>
           <p className="text-sm text-gray-600 line-clamp-2">
-            {offer.description}
+            {offer.description || ''}
           </p>
         </div>
 
-        {/* Date Range Section */}
-        <div className="flex items-center gap-2 mb-3 text-xs text-gray-500">
+        {/* Optional: Date Range */}
+        {/* <div className="flex items-center gap-2 mb-3 text-xs text-gray-500">
           <FaCalendarAlt className="w-3 h-3" />
           <div className="flex gap-1">
             <span>{formatDate(offer.startDate)}</span>
             <span>-</span>
             <span>{formatDate(offer.endDate)}</span>
           </div>
-        </div>
+        </div> */}
 
-        {/* View Details Button */}
-        <button 
+        {/* View Button */}
+        <button
           onClick={(e) => {
             e.stopPropagation();
             handleOfferClick();
           }}
           className="w-full px-4 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium 
-                   transform transition-all duration-200 hover:bg-violet-700 hover:shadow-lg 
-                   active:scale-98 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
+                     transform transition-all duration-200 hover:bg-violet-700 hover:shadow-lg 
+                     active:scale-98 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
         >
           View Details
         </button>
@@ -145,4 +149,4 @@ const OfferCard = ({ offer, onCopyLink }) => {
   );
 };
 
-export default OfferCard; 
+export default OfferCard;
