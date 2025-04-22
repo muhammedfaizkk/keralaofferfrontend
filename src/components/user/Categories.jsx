@@ -32,12 +32,12 @@ function Categories() {
   }
 
   return (
-    <div className="w-full py-6 mt-10 px-2">
+    <div className="w-full py-6 mt-0 md:mt-10 px-2">
       <Swiper
         spaceBetween={20}
         slidesPerView={3}
         breakpoints={{
-          640: { slidesPerView: 4 },
+          320: { slidesPerView: 4 },
           768: { slidesPerView: 5 },
           1024: { slidesPerView: 8},
         }}

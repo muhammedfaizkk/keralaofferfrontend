@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import OfferCard from './OfferCard';
 import { useFetchAds } from '../../hooks/user/Userads';
 import { toast } from 'react-toastify';
+import { FiArrowRight } from 'react-icons/fi';
 
 function OfferSection() {
   const { ads, loading, error } = useFetchAds();
@@ -96,9 +97,9 @@ function OfferSection() {
       )}
       <button
         onClick={() => navigate('/offers')}
-        className="block mx-auto mb-20 md:mb-0 px-4 py-2 text-sm sm:text-base font-semibold text-violet-700 rounded-md hover:text-violet-400 transition-colors duration-300 text-center"
+        className="flex items-center gap-2 mx-auto px-4 py-2 text-sm sm:text-base font-semibold text-violet-700 rounded-md hover:text-violet-400 transition-colors duration-300"
       >
-        View All
+        View All <FiArrowRight className="text-lg" />
       </button>
     </div>
   );

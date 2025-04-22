@@ -53,7 +53,7 @@ const OfferCard = ({ offer, onCopyLink }) => {
       onClick={handleOfferClick}
     >
       <div className="relative">
-        <div className="relative h-[200px] overflow-hidden">
+        <div className="relative h-[170px] md:h-[200px] overflow-hidden">
           <img
             src={offer.image || offer.store?.logoUrl || 'https://via.placeholder.com/400x300?text=No+Image'}
             alt={offer.description || 'Offer image'}
@@ -106,7 +106,7 @@ const OfferCard = ({ offer, onCopyLink }) => {
         )}
       </div>
 
-      <div className="p-4">
+      <div className="px-4 pt-4">
         {/* Offer Details */}
         <div className="flex flex-col gap-2 mb-3">
           <div className="flex items-center justify-between">
@@ -117,9 +117,9 @@ const OfferCard = ({ offer, onCopyLink }) => {
               {offer.store?.category || ''}
             </span>
           </div>
-          <p className="text-sm text-gray-600 line-clamp-2">
+          {/* <p className="text-sm text-gray-600 line-clamp-2">
             {offer.description || ''}
-          </p>
+          </p> */}
         </div>
 
         {/* Optional: Date Range */}
@@ -133,18 +133,19 @@ const OfferCard = ({ offer, onCopyLink }) => {
         </div> */}
 
         {/* View Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleOfferClick();
-          }}
-          className="w-full px-4 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium 
+
+      </div>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleOfferClick();
+        }}
+        className="w-full px-4 py-2.5 bg-violet-600 text-white text-sm font-medium 
                      transform transition-all duration-200 hover:bg-violet-700 hover:shadow-lg 
                      active:scale-98 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
-        >
-          View Details
-        </button>
-      </div>
+      >
+        View Details
+      </button>
     </div>
   );
 };

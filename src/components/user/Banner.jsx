@@ -56,7 +56,7 @@ function Banner() {
           <img
             src={mobileBannerImage}
             alt="Mobile Banner"
-            className="block sm:hidden w-full h-full object-cover"
+            className="block sm:hidden w-full h-[75vh] object-cover"
           />
         )}
 
