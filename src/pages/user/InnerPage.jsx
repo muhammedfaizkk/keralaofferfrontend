@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Header from '../../components/user/Header';
 import { useFetchAdById, useFetchAds } from '../../hooks/user/Userads';
 import { toast } from 'react-toastify';
 
@@ -87,7 +86,7 @@ const InnerPage = () => {
   if (adLoading) {
     return (
       <div className="min-h-screen bg-gray-100 font-poppins">
-        <Header />
+    
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-600"></div>
@@ -100,7 +99,7 @@ const InnerPage = () => {
   if (adError || !ad) {
     return (
       <div className="min-h-screen bg-gray-100 font-poppins">
-        <Header />
+      
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <div className="text-red-500 text-lg mb-4">
@@ -121,7 +120,7 @@ const InnerPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 font-poppins">
-      <Header />
+     
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">

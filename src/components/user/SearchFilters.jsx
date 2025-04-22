@@ -10,6 +10,7 @@ import {
   useGetallstorenames,
 } from "../../hooks/user/Filtershook"
 import { toast } from "react-toastify"
+import { useNavigate, useLocation } from "react-router-dom"
 
 function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initialFilters = {} }) {
   const [dropdownOpen, setDropdownOpen] = useState(null)
@@ -18,8 +19,14 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
   const [dropdownSearchQueries, setDropdownSearchQueries] = useState({})
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false)
   const dropdownRef = useRef(null)
   const searchInputRef = useRef(null)
+
+  // React Router hooks for URL handling
+  const navigate = useNavigate()
+  const location = useLocation()
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search])
 
   const { offertypes, loading: offerTypesLoading } = useGetOffertypes()
   const { categories, loading: categoriesLoading } = useGetstorecategory()
@@ -29,25 +36,41 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
   // Check if screen is mobile
   const [isMobile, setIsMobile] = useState(false)
+
   const handleCopyLink = () => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams()
     if (searchQuery) {
-      params.append("searchQuery", searchQuery);
+      params.append("q", searchQuery)
     }
+
+    // Map filter keys to URL parameter names
+    const paramMap = {
+      "All Stores": "store",
+      "All Categories": "category",
+      "All Districts": "district",
+      "All Locations": "location",
+      "All Offer Types": "offerType",
+    }
+
     Object.entries(selectedValues).forEach(([key, value]) => {
-      if (value && value.label) {
-        params.append(key, value.label);
+      if (value && value.label && paramMap[key]) {
+        params.append(paramMap[key], value.label)
       }
-    });
-    const baseUrl = window.location.href.split('?')[0];
-    const linkToCopy = `${baseUrl}?${params.toString()}`;
-    navigator.clipboard.writeText(linkToCopy).then(() => {
-      toast.success('Link copied to clipboard!');
-    }).catch((err) => {
-      toast.error('Failed to copy link');
-      console.error('Failed to copy link:', err);
-    });
-  };
+    })
+
+    const baseUrl = window.location.href.split("?")[0]
+    const linkToCopy = `${baseUrl}${params.toString() ? `?${params.toString()}` : ""}`
+
+    navigator.clipboard
+      .writeText(linkToCopy)
+      .then(() => {
+        toast.success("Link copied to clipboard!")
+      })
+      .catch((err) => {
+        toast.error("Failed to copy link")
+        console.error("Failed to copy link:", err)
+      })
+  }
 
   useEffect(() => {
     const checkIfMobile = () => {
@@ -129,6 +152,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         data: processedStoreNames,
         icon: "🏪",
         loading: storesLoading,
+        paramName: "store",
       },
       {
         id: "categories",
@@ -136,6 +160,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         data: processedCategories,
         icon: "📑",
         loading: categoriesLoading,
+        paramName: "category",
       },
       {
         id: "districts",
@@ -143,6 +168,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         data: processedDistricts,
         icon: "🏛️",
         loading: districtsLoading,
+        paramName: "district",
       },
       {
         id: "locations",
@@ -150,6 +176,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         data: processedLocations,
         icon: "📍",
         loading: locationsLoading,
+        paramName: "location",
         filterBy: (location, filters) => {
           if (filters["All Districts"] && filters["All Districts"].label) {
             return location.district === filters["All Districts"].label
@@ -163,6 +190,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         data: processedOfferTypes,
         icon: "🏷️",
         loading: offerTypesLoading,
+        paramName: "offerType",
       },
     ],
     [
@@ -179,9 +207,52 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     ],
   )
 
+  // Load filters from URL on initial load - ONLY ONCE
+  useEffect(() => {
+    // Skip if we've already done the initial load or if dropdownItems aren't ready
+    if (initialLoadComplete || dropdownItems.some((item) => item.loading)) {
+      return
+    }
+
+    const loadFiltersFromURL = () => {
+      const newFilters = {}
+      const query = searchParams.get("q")
+
+      if (query) {
+        setSearchQuery(query)
+      }
+
+      // Process each possible filter from URL
+      dropdownItems.forEach((item) => {
+        const paramValue = searchParams.get(item.paramName)
+        if (!paramValue) return
+
+        const matchedOption = item.data.find((option) => option.label.toLowerCase() === paramValue.toLowerCase())
+
+        if (matchedOption) {
+          newFilters[item.label] = matchedOption
+        }
+      })
+
+      // Only update state if there are actual filters to set
+      if (Object.keys(newFilters).length > 0 || query) {
+        setSelectedValues(newFilters)
+        onFilterChange?.({
+          ...newFilters,
+          searchQuery: query || "",
+        })
+      }
+
+      // Mark initial load as complete to prevent further loads
+      setInitialLoadComplete(true)
+    }
+
+    loadFiltersFromURL()
+  }, [searchParams, dropdownItems, onFilterChange, initialLoadComplete])
+
   // Initialize filters from props
   useEffect(() => {
-    if (!initialFilters || typeof initialFilters !== "object") return
+    if (!initialFilters || typeof initialFilters !== "object" || initialLoadComplete) return
 
     const validFilters = {}
 
@@ -217,13 +288,10 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
       }
     })
 
-    setSelectedValues((prevValues) => {
-      const hasChanges = Object.keys(validFilters).some(
-        (key) => prevValues[key]?.id !== validFilters[key]?.id || prevValues[key]?.label !== validFilters[key]?.label,
-      )
-      return hasChanges ? validFilters : prevValues
-    })
-  }, [initialFilters, dropdownItems])
+    if (Object.keys(validFilters).length > 0) {
+      setSelectedValues(validFilters)
+    }
+  }, [initialFilters, dropdownItems, initialLoadComplete])
 
   // Toggle dropdown
   const toggleDropdown = (label) => {
@@ -274,6 +342,37 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     return () => document.removeEventListener("keydown", handleKeyPress)
   }, [])
 
+  // Update URL when filters change
+  const updateURLWithFilters = (newValues, newQuery) => {
+    // Create new URL parameters
+    const params = new URLSearchParams()
+
+    // Add search query if exists
+    if (newQuery) {
+      params.set("q", newQuery)
+    }
+
+    // Add selected filters
+    Object.entries(newValues).forEach(([key, value]) => {
+      if (!value || !value.label) return
+
+      // Find param name for this filter
+      const dropdownItem = dropdownItems.find((item) => item.label === key)
+      if (dropdownItem?.paramName) {
+        params.set(dropdownItem.paramName, value.label)
+      }
+    })
+
+    // Update URL using React Router navigate
+    navigate(
+      {
+        pathname: location.pathname,
+        search: params.toString(),
+      },
+      { replace: true },
+    )
+  }
+
   const handleSelect = (dropdownLabel, option) => {
     if (!option) return
 
@@ -298,6 +397,8 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     setSelectedValues(newValues)
     setDropdownOpen(null)
 
+    // Update both component state and URL
+    updateURLWithFilters(newValues, searchQuery)
     onFilterChange?.({
       ...newValues,
       searchQuery,
@@ -305,55 +406,53 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   }
 
   const clearFilter = (label) => {
-    const newValues = { ...selectedValues };
-    delete newValues[label];
-  
-    // Update URL params without the cleared filter
-    const params = new URLSearchParams(searchParams);
-    
-    // Map filter labels to URL param names
-    const paramMap = {
-      "All Stores": "store",
-      "All Categories": "category",
-      "All Districts": "district",
-      "All Locations": "location",
-      "All Offer Types": "offerType"
-    };
-    
-    if (paramMap[label]) {
-      params.delete(paramMap[label]);
-    }
-  
+    const newValues = { ...selectedValues }
+    delete newValues[label]
+
     // If clearing district, also clear location
     if (label === "All Districts" && selectedValues["All Locations"]) {
-      delete newValues["All Locations"];
-      params.delete("location");
+      delete newValues["All Locations"]
     }
-  
-    setSelectedValues(newValues);
-    setSearchParams(params);
-  
+
+    setSelectedValues(newValues)
+
+    // Update URL and notify parent component
+    updateURLWithFilters(newValues, searchQuery)
     onFilterChange?.({
       ...newValues,
       searchQuery,
-    });
-  };
+    })
+  }
 
   const clearAllFilters = () => {
-    setSelectedValues({});
-    setSearchQuery("");
-    setSearchParams(new URLSearchParams()); // Clear all URL params
-    onFilterChange?.({ searchQuery: "" });
-  };
+    // Clear all state
+    setSelectedValues({})
+    setSearchQuery("")
+
+    // Clear URL parameters
+    navigate(location.pathname, { replace: true })
+
+    // Notify parent component
+    onFilterChange?.({ searchQuery: "" })
+
+    console.log("Filters cleared")
+  }
 
   const handleSearchChange = (e) => {
     const query = e.target.value
     setSearchQuery(query)
 
-    onFilterChange?.({
-      ...selectedValues,
-      searchQuery: query,
-    })
+    // Debounce URL updates for search
+    const delayDebounceFn = setTimeout(() => {
+      updateURLWithFilters(selectedValues, query)
+
+      onFilterChange?.({
+        ...selectedValues,
+        searchQuery: query,
+      })
+    }, 300)
+
+    return () => clearTimeout(delayDebounceFn)
   }
 
   const handleDropdownSearchChange = (e, dropdownLabel) => {
@@ -408,7 +507,6 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   return (
     <div>
       <div className="fixed top-28 left-4 z-50 flex flex-col gap-2">
-
         {/* Filter Toggle Button */}
         <button
           onClick={isMobile ? toggleMobileFilters : () => setIsCollapsed(!isCollapsed)}
@@ -424,10 +522,9 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
           }
         >
           <Filter
-            className={`w-5 h-5 transition-transform duration-300 ${(isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed)
-              ? "text-violet-600 rotate-180"
-              : ""
-              }`}
+            className={`w-5 h-5 transition-transform duration-300 ${
+              (isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed) ? "text-violet-600 rotate-180" : ""
+            }`}
           />
         </button>
 
@@ -436,11 +533,11 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
           onClick={handleShareFilters}
           className="sm:hidden bg-white border border-violet-200 text-gray-600 hover:text-violet-700 hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 p-2 rounded-full shadow transition-all duration-300"
         >
-          <Share2 className={`w-5 h-5 transition-transform duration-300 ${(isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed)
-            ? "text-violet-600 rotate-180"
-            : ""
-            }`} />
-
+          <Share2
+            className={`w-5 h-5 transition-transform duration-300 ${
+              (isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed) ? "text-violet-600 rotate-180" : ""
+            }`}
+          />
         </button>
       </div>
 
@@ -473,7 +570,6 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
               )}
             </div>
 
-
             {(!isMobile && !isCollapsed) || (isMobile && isMobileFiltersOpen) ? (
               <>
                 {/* Filter Chips */}
@@ -502,6 +598,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
                         <button
                           onClick={() => {
                             setSearchQuery("")
+                            updateURLWithFilters(selectedValues, "")
                             onFilterChange?.({ ...selectedValues, searchQuery: "" })
                           }}
                           className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -527,10 +624,11 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
                               onClick={() => toggleDropdown(item.label)}
                               disabled={item.loading}
                               className={`flex items-center justify-between gap-2 border rounded-lg px-3 py-2.5 text-sm w-full
-                              ${selectedValues[item.label]
+                              ${
+                                selectedValues[item.label]
                                   ? "bg-violet-50 border-violet-300 text-violet-700"
                                   : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
-                                }
+                              }
                               ${item.loading ? "opacity-50 cursor-not-allowed" : ""}
                               transition-all duration-200`}
                               aria-expanded={dropdownOpen === item.label}
@@ -573,10 +671,11 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
                                       <button
                                         key={option.id}
                                         className={`w-full text-left px-4 py-2.5 text-sm hover:bg-violet-50 cursor-pointer
-                                        ${selectedValues[item.label]?.id === option.id
+                                        ${
+                                          selectedValues[item.label]?.id === option.id
                                             ? "bg-violet-100 text-violet-700 font-medium"
                                             : "text-gray-700"
-                                          }
+                                        }
                                         flex items-center justify-between`}
                                         onClick={() => handleSelect(item.label, option)}
                                         role="option"
@@ -625,10 +724,8 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
                     <span className="text-sm text-violet-600 hover:text-violet-700 transition-colors">Copy Link</span>
                   </div>
                 </div>
-
               </>
             ) : null}
-
 
             {isMobile && !isMobileFiltersOpen && getActiveFiltersCount() > 0 && (
               <div className="px-3 text-sm text-gray-600 mt-1">
@@ -640,7 +737,6 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
           </div>
         </div>
       )}
-
 
       {isMobile && !isMobileFiltersOpen && getActiveFiltersCount() > 0 && (
         <div className="mt-2 text-sm text-violet-600 font-medium">

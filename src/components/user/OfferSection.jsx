@@ -96,7 +96,7 @@ function OfferSection() {
       )}
       <button
         onClick={() => navigate('/offers')}
-        className="block mx-auto px-4 py-2 text-sm sm:text-base font-semibold text-violet-700 rounded-md hover:text-violet-400 transition-colors duration-300 text-center"
+        className="block mx-auto mb-20 md:mb-0 px-4 py-2 text-sm sm:text-base font-semibold text-violet-700 rounded-md hover:text-violet-400 transition-colors duration-300 text-center"
       >
         View All
       </button>

@@ -86,7 +86,6 @@ const StoreDisplay = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 py-6 md:px-4 sm:px-6 lg:py-8 lg:px-8 max-w-7xl mx-auto">
-            {/* Store Header */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
                 <div className="relative h-48 md:h-56 lg:h-64">
                     <img

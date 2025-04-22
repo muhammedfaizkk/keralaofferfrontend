@@ -7,9 +7,11 @@ import ContactUs from '../pages/user/ContactUs';
 import AboutUs from '../pages/user/AboutUs';
 import Offers from '../pages/user/Offers';
 import Footer from '../components/user/Footer';
+import Header from '../components/user/Header'
 
 const User = () => (
   <>
+  <Header/>
     <Routes>
       <Route element={<UserLayout />}>
         <Route index element={<Home />} />

@@ -11,10 +11,10 @@ const Header = () => {
     <>
       {/* Top Header with Shadow Box */}
       <header className="bg-white">
-        <div className="max-w-[1450px] mx-auto mt-4 px-4 sm:px-6 lg:px-8">
-          <div className="rounded-xl shadow-sm bg-white flex justify-between items-center px-3 sm:px-6 py-2 relative">
+        <div className="max-w-[1450px] mx-auto pt-4 px-4 sm:px-6 lg:px-8">
+          <div className="rounded-xl shadow-sm flex justify-between items-center px-3 sm:px-6 py-2 relative">
             {/* Logo in box */}
-            <div className="flex items-center gap-2 rounded-md px-3 py-2 bg-gray-50">
+            <div className="flex items-center gap-2 rounded-md px-3 py-2">
               <Link to="/">
                 <img
                   src="/logonav.png"

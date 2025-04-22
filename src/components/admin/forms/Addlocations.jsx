@@ -49,7 +49,7 @@ const Addlocations = ({ onClose, locationToEdit,refetch }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        {/* Header */}
+
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-semibold">{locationToEdit ? 'Edit Location' : 'Add Location'}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">

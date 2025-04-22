@@ -1,96 +1,60 @@
-import { ShoppingBag, Home, Share2 } from 'lucide-react';
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import React from 'react';
+import { FaYoutube, FaFacebookF, FaInstagram } from 'react-icons/fa';
+import { Twitter } from 'lucide-react'; 
 
-function Footer() {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const [copied, setCopied] = useState(false);
 
-    const handleShare = async () => {
-        const shareData = {
-            title: document.title,
-            text: 'Check out these amazing offers!',
-            url: window.location.href,
-        };
 
-        if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (error) {
-                console.error('Sharing failed', error);
-            }
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
-
-    const navItems = [
-        {
-            icon: <Home size={24} />,
-            label: 'Home',
-            path: '/',
-            key: 'home',
-            type: 'nav'
-        },
-        {
-            icon: <Share2 size={24} />,
-            label: 'Share',
-            key: 'share',
-            type: 'share'
-        },
-        {
-            icon: <ShoppingBag size={24} />,
-            label: 'Offers',
-            path: '/offer?section=more',
-            key: 'offers',
-            type: 'nav'
-        }
-    ];
+const Footer = () => {
     return (
-        <div>
-            <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg z-50 flex justify-around items-center py-3 px-4 md:hidden border-t border-gray-100">
-                {navItems.map((item) => {
-                    const isActive = location.pathname === item.path;
-                    const isShare = item.type === 'share';
+        <div className="bg-white text-black w-full">
+            {/* Navbar */}
+            <nav className="py-4 px-4 md:px-8 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+                {/* Logo */}
+                <Link to="/" className="flex-shrink-0">
+                    <img
+                        src="/logonav.png"
+                        alt="Kerala Offer Logo"
+                        className="h-8 w-auto sm:h-10 md:h-12 lg:h-14"
+                    />
+                </Link>
 
-                    return (
-                        <button
-                            key={item.key}
-                            onClick={() => isShare ? handleShare() : navigate(item.path)}
-                            className={`flex flex-col items-center cursor-pointer transition-all duration-200 ${isActive ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
-                                }`}
-                            aria-label={item.label}
-                        >
-                            <div className={`p-2 rounded-full ${isActive ? 'bg-purple-100' : ''
-                                }`}>
-                                {React.cloneElement(item.icon, {
-                                    className: isActive ? 'fill-current' : '',
-                                    strokeWidth: isActive ? 2 : 1.5
-                                })}
-                            </div>
-                            <span className="text-xs mt-1 font-medium">{item.label}</span>
-                            {copied && item.key === 'share' && (
-                                <span className="absolute -top-8 bg-gray-800 text-white text-xs px-2 py-1 rounded">
-                                    Copied!
-                                </span>
-                            )}
-                        </button>
-                    );
-                })}
+                {/* Nav Links */}
+                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-6 lg:gap-8 font-medium text-black text-sm md:text-base lg:text-lg">
+                    <Link to="/" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">Home</Link>
+                    <Link to="/about" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">About</Link>
+                    <Link to="/offers" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">Offers</Link>
+                    <Link to="/contact" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">Contact</Link>
+                </div>
+
+                {/* Social Icons */}
+                <div className="flex gap-3 md:gap-4">
+                    <a href="#" className="bg-violet-300 text-black rounded-full p-2 hover:bg-violet-200 transition-colors" aria-label="Facebook">
+                        <FaFacebookF className="w-3 h-3 md:w-4 md:h-4" />
+                    </a>
+                    <a href="#" className="bg-violet-300 text-black rounded-full p-2 hover:bg-violet-200 transition-colors" aria-label="Instagram">
+                        <FaInstagram className="w-3 h-3 md:w-4 md:h-4" />
+                    </a>
+                    <a href="#" className="bg-violet-300 text-black rounded-full p-2 hover:bg-violet-200 transition-colors" aria-label="Twitter">
+                        <FaYoutube className="w-3 h-3 md:w-4 md:h-4" />
+                    </a>
+                    <a href="#" className="bg-violet-300 text-black rounded-full p-2 hover:bg-violet-200 transition-colors" aria-label="Twitter">
+                        <Twitter className="w-3 h-3 md:w-4 md:h-4" />
+                    </a>
+                </div>
+            </nav>
+
+            {/* Bottom border under the menu */}
+            <div className="border-t border-gray-200 mx-4 md:mx-8 lg:mx-12"></div>
+
+            {/* Footer Text */}
+            <div className="w-full py-3 px-4">
+                <div className="text-center text-xs sm:text-sm text-black max-w-screen-sm mx-auto">
+                    © 2025 KeralaOffers. Powered by Willowy Infotech Pvt Ltd.
+                </div>
             </div>
-
-            {/* Desktop Footer */}
-            <footer className="hidden md:flex flex-col items-center w-full py-4 bg-gray-50 text-gray-600 text-sm border-t border-gray-200">
-
-                <p className="text-center">
-                 © Copyright {new Date().getFullYear()} keralaoffers. Powered by Willowy Infotech Pvt Ltd.
-                </p>
-            </footer>
         </div>
-    )
-}
+    );
+};
 
-export default Footer
+export default Footer;

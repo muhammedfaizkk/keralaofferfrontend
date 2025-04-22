@@ -1,8 +1,5 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom"
-import Header from "../../components/user/Header"
 import OfferCard from "../../components/user/OfferCard"
 import SearchFilters from "../../components/user/SearchFilters"
 import { useFetchAds } from "../../hooks/user/Userads"
@@ -17,21 +14,21 @@ const Offers = () => {
   const [likedOffers, setLikedOffers] = useState({})
   const [showExpired, setShowExpired] = useState(searchParams.get("showExpired") === "true")
 
-  // Get initial filters from URL parameters
+  // Get initial filters from URL parameters - standardize parameter names
   const getInitialFilters = () => {
-    const params = Object.fromEntries(searchParams.entries());
     return {
-      searchQuery: params.search || "",
-      "All Stores": params.store ? { label: params.store } : null,
-      "All Categories": params.category ? { label: params.category } : null,
-      "All Districts": params.district ? { label: params.district } : null,
-      "All Locations": params.location ? { label: params.location } : null,
-      "All Offer Types": params.offerType ? { label: params.offerType } : null,
+      searchQuery: searchParams.get("search") || "",
+      "All Stores": searchParams.get("store") ? { label: searchParams.get("store") } : null,
+      "All Categories": searchParams.get("category") ? { label: searchParams.get("category") } : null,
+      "All Districts": searchParams.get("district") ? { label: searchParams.get("district") } : null,
+      "All Locations": searchParams.get("location") ? { label: searchParams.get("location") } : null,
+      "All Offer Types": searchParams.get("offerType") ? { label: searchParams.get("offerType") } : null,
     };
   };
+  
   const [filters, setFilters] = useState(getInitialFilters())
 
-  // Update URL when filters change
+  // Update URL when filters change - standardize parameter names
   const updateUrlParams = (newFilters, newShowExpired) => {
     const params = new URLSearchParams()
 
@@ -48,10 +45,7 @@ const Offers = () => {
 
   // Handle filter changes from SearchFilters component
   const handleFilterChange = (newFilters) => {
-    // Update the filters state with the new filters
     setFilters(newFilters)
-
-    // Update URL params
     updateUrlParams(newFilters, showExpired)
   }
 
@@ -140,6 +134,8 @@ const Offers = () => {
   useEffect(() => {
     const newFilters = getInitialFilters()
     setFilters(newFilters)
+    // When URL changes but not because of our setSearchParams, also update showExpired state
+    setShowExpired(searchParams.get("showExpired") === "true")
   }, [location.search])
 
   const handleOfferClick = (adId) => {
@@ -168,14 +164,14 @@ const Offers = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-poppins">
-      <Header />
-
       <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
         <SearchFilters
           onFilterChange={handleFilterChange}
           totalResults={filteredAds.length}
           initialFilters={filters}
           handleShareFilters={handleShareFilters}
+          searchParams={searchParams}
+          setSearchParams={setSearchParams}
         />
 
         <div className="py-8">
@@ -183,24 +179,7 @@ const Offers = () => {
             <h1 className="text-[24px] sm:text-[28px] lg:text-[32px] font-semibold text-gray-900 text-center sm:text-left">
               Latest Offers
             </h1>
-            {/* <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
-              <button
-                onClick={handleShareFilters}
-                className="flex items-center gap-2 px-4 py-2.5 text-[14px] font-medium text-violet-600 bg-violet-50 rounded-lg hover:bg-violet-100 transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-                Share Filters
-              </button>
-              <label className="flex items-center gap-2 text-[14px] text-gray-600">
-                <input
-                  type="checkbox"
-                  checked={showExpired}
-                  onChange={handleExpiredToggle}
-                  className="rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-                />
-                Show expired offers
-              </label>
-            </div> */}
+            {/* Commented out for brevity but can be uncommented if needed */}
           </div>
 
           {adsLoading && (

@@ -1,12 +1,14 @@
 import React from 'react';
 import { MapPin, Phone, Clock } from 'lucide-react';
-import Header from '../../components/user/Header';
+
+
+
 
 function ContactUs() {
   return (
     <>
-      <Header />
-      {/* Hero Section */}
+     
+      
       <div className="relative bg-black text-white">
         <div className="absolute inset-0">
           <img 
@@ -105,7 +107,7 @@ function ContactUs() {
             {/* Image */}
             <div className="hidden md:block">
               <img
-                src="/Images/contact-form.jpg"
+                src="\assets\Images\5118756.png"
                 alt="Contact"
                 className="w-full h-full object-cover rounded-lg"
               />
