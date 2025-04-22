@@ -19,7 +19,7 @@ const Offers = () => {
 
   // Get initial filters from URL parameters
   const getInitialFilters = () => {
-    const params = Object.fromEntries(searchParams.entries())
+    const params = Object.fromEntries(searchParams.entries());
     return {
       searchQuery: params.search || "",
       "All Stores": params.store ? { label: params.store } : null,
@@ -27,9 +27,8 @@ const Offers = () => {
       "All Districts": params.district ? { label: params.district } : null,
       "All Locations": params.location ? { label: params.location } : null,
       "All Offer Types": params.offerType ? { label: params.offerType } : null,
-    }
-  }
-
+    };
+  };
   const [filters, setFilters] = useState(getInitialFilters())
 
   // Update URL when filters change

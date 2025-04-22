@@ -10,12 +10,12 @@ function OfferSection() {
   const [likedOffers, setLikedOffers] = useState({});
   const [filteredAds, setFilteredAds] = useState([]);
 
-  // Filter out expired offers and sort by end date
+  // Filter out expired offers and sort by creation date (newest first)
   useEffect(() => {
     if (ads) {
       const validAds = ads
         .filter(ad => new Date(ad.endDate) > new Date()) // Only show active offers
-        .sort((a, b) => new Date(a.endDate) - new Date(b.endDate)); // Sort by end date
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by creation date (newest first)
       setFilteredAds(validAds);
     }
   }, [ads]);
@@ -49,12 +49,6 @@ function OfferSection() {
         <h2 className="text-[20px] sm:text-[24px] md:text-[28px] font-semibold text-gray-900">
           Latest Offers
         </h2>
-        <button
-          onClick={() => navigate('/offers')}
-          className="text-[14px] sm:text-[16px] font-medium text-violet-600 hover:text-violet-700 transition-colors"
-        >
-          View All Offers
-        </button>
       </div>
 
       {loading && (
@@ -100,6 +94,12 @@ function OfferSection() {
           )}
         </>
       )}
+      <button
+        onClick={() => navigate('/offers')}
+        className="block mx-auto px-4 py-2 text-sm sm:text-base font-semibold text-violet-700 rounded-md hover:text-violet-400 transition-colors duration-300 text-center"
+      >
+        View All
+      </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
-import { Search, ChevronDown, X, Filter, RefreshCw, Share2 } from "lucide-react"
+import { Search, ChevronDown, X, Filter, RefreshCw, Share2, Copy } from "lucide-react"
 import {
   useGetOffertypes,
   useGetstorecategory,
@@ -9,6 +9,7 @@ import {
   useGetLocations,
   useGetallstorenames,
 } from "../../hooks/user/Filtershook"
+import { toast } from "react-toastify"
 
 function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initialFilters = {} }) {
   const [dropdownOpen, setDropdownOpen] = useState(null)
@@ -28,6 +29,25 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
   // Check if screen is mobile
   const [isMobile, setIsMobile] = useState(false)
+  const handleCopyLink = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) {
+      params.append("searchQuery", searchQuery);
+    }
+    Object.entries(selectedValues).forEach(([key, value]) => {
+      if (value && value.label) {
+        params.append(key, value.label);
+      }
+    });
+    const baseUrl = window.location.href.split('?')[0];
+    const linkToCopy = `${baseUrl}?${params.toString()}`;
+    navigator.clipboard.writeText(linkToCopy).then(() => {
+      toast.success('Link copied to clipboard!');
+    }).catch((err) => {
+      toast.error('Failed to copy link');
+      console.error('Failed to copy link:', err);
+    });
+  };
 
   useEffect(() => {
     const checkIfMobile = () => {
@@ -285,27 +305,46 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   }
 
   const clearFilter = (label) => {
-    const newValues = { ...selectedValues }
-    delete newValues[label]
-
-    // If clearing district, also clear location
-    if (label === "All Districts" && newValues["All Locations"]) {
-      delete newValues["All Locations"]
+    const newValues = { ...selectedValues };
+    delete newValues[label];
+  
+    // Update URL params without the cleared filter
+    const params = new URLSearchParams(searchParams);
+    
+    // Map filter labels to URL param names
+    const paramMap = {
+      "All Stores": "store",
+      "All Categories": "category",
+      "All Districts": "district",
+      "All Locations": "location",
+      "All Offer Types": "offerType"
+    };
+    
+    if (paramMap[label]) {
+      params.delete(paramMap[label]);
     }
-
-    setSelectedValues(newValues)
-
+  
+    // If clearing district, also clear location
+    if (label === "All Districts" && selectedValues["All Locations"]) {
+      delete newValues["All Locations"];
+      params.delete("location");
+    }
+  
+    setSelectedValues(newValues);
+    setSearchParams(params);
+  
     onFilterChange?.({
       ...newValues,
       searchQuery,
-    })
-  }
+    });
+  };
 
   const clearAllFilters = () => {
-    setSelectedValues({})
-    setSearchQuery("")
-    onFilterChange?.({ searchQuery: "" })
-  }
+    setSelectedValues({});
+    setSearchQuery("");
+    setSearchParams(new URLSearchParams()); // Clear all URL params
+    onFilterChange?.({ searchQuery: "" });
+  };
 
   const handleSearchChange = (e) => {
     const query = e.target.value
@@ -386,8 +425,8 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         >
           <Filter
             className={`w-5 h-5 transition-transform duration-300 ${(isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed)
-                ? "text-violet-600 rotate-180"
-                : ""
+              ? "text-violet-600 rotate-180"
+              : ""
               }`}
           />
         </button>
@@ -398,8 +437,8 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
           className="sm:hidden bg-white border border-violet-200 text-gray-600 hover:text-violet-700 hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 p-2 rounded-full shadow transition-all duration-300"
         >
           <Share2 className={`w-5 h-5 transition-transform duration-300 ${(isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed)
-              ? "text-violet-600 rotate-180"
-              : ""
+            ? "text-violet-600 rotate-180"
+            : ""
             }`} />
 
         </button>
@@ -434,7 +473,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
               )}
             </div>
 
-            {/* Only show all filters content on desktop OR when mobile filters are open */}
+
             {(!isMobile && !isCollapsed) || (isMobile && isMobileFiltersOpen) ? (
               <>
                 {/* Filter Chips */}
@@ -572,17 +611,25 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
                 </div>
 
                 {/* Results count */}
-                {totalResults !== undefined && (
-                  <div className="px-3 sm:px-6 mt-4 text-sm text-gray-600">
-                    <span>
-                      {totalResults} result{totalResults !== 1 ? "s" : ""} found
-                    </span>
+                <div className="w-full flex flex-wrap justify-between items-center">
+                  {totalResults !== undefined && (
+                    <div className="px-3 sm:px-6 mt-4 text-sm text-gray-600">
+                      <span>
+                        {totalResults} result{totalResults !== 1 ? "s" : ""} found
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="px-3 sm:px-6 mt-4 flex items-center gap-2 cursor-pointer" onClick={handleCopyLink}>
+                    <Copy className="w-4 h-4 text-violet-600 hover:text-violet-700 transition-colors" />
+                    <span className="text-sm text-violet-600 hover:text-violet-700 transition-colors">Copy Link</span>
                   </div>
-                )}
+                </div>
+
               </>
             ) : null}
 
-            {/* Show applied filters count on mobile when collapsed */}
+
             {isMobile && !isMobileFiltersOpen && getActiveFiltersCount() > 0 && (
               <div className="px-3 text-sm text-gray-600 mt-1">
                 <span className="text-violet-600 font-medium">
@@ -594,7 +641,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         </div>
       )}
 
-      {/* Show filter count badge when filters are hidden on mobile */}
+
       {isMobile && !isMobileFiltersOpen && getActiveFiltersCount() > 0 && (
         <div className="mt-2 text-sm text-violet-600 font-medium">
           {getActiveFiltersCount()} filter{getActiveFiltersCount() !== 1 ? "s" : ""} applied
