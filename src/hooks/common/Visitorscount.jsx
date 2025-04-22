@@ -4,7 +4,7 @@ import axiosInstance from '../../api/axiosInstance';
 
 export const getVisitorsCount = async () => {
   try {
-    const response = await axiosInstance.get('/visitors/count');
+    const response = await axiosInstance.get('/getincrement');
     return response.data.count;
   } catch (error) {
     console.error('Error fetching visitors count:', error);
@@ -18,7 +18,7 @@ export const getVisitorsCount = async () => {
 
 export const incrementVisitorsCount = async () => {
   try {
-    const response = await axiosInstance.post('/visitors/increment');
+    const response = await axiosInstance.post('/postincrement');
     return response.data.count;
   } catch (error) {
     console.error('Error incrementing visitors count:', error);
@@ -28,7 +28,7 @@ export const incrementVisitorsCount = async () => {
 
 export const resetVisitorsCount = async () => {
   try {
-    const response = await axiosInstance.post('/visitors/reset'); // assuming POST /visitors/reset
+    const response = await axiosInstance.post('/reset'); // assuming POST /visitors/reset
     return response.data.count;
   } catch (error) {
     console.error('Error resetting visitors count:', error);
