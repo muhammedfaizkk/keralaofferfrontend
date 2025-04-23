@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Menu, Search, X } from "lucide-react";
 import { Link } from 'react-router-dom';
 
-
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -27,18 +26,6 @@ const Header = () => {
                 />
               </Link>
             </div>
-
-            {/* Mobile Search Input - visible only on mobile screens */}
-            {/* <div className="block sm:hidden flex-1 px-2">
-              <div className="flex items-center bg-gray-100 rounded-md px-3 py-2 w-full h-[42px]">
-                <Search className="min-w-[17px] min-h-[17px] text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search here..."
-                  className="bg-transparent outline-none text-sm text-gray-600 w-full ml-2"
-                />
-              </div>
-            </div> */}
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex gap-2 font-medium font-mluvka sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
@@ -69,7 +56,7 @@ const Header = () => {
             />
             <div className="lg:hidden fixed top-0 right-0 h-full w-[250px] bg-white shadow-md z-20">
               <div className="flex justify-between items-center p-4">
-                <Link to="/">
+                <Link to="/" onClick={() => setMenuOpen(false)}>
                   <img
                     src="/logonav.png"
                     alt="Kerala Offer Logo"
@@ -81,10 +68,10 @@ const Header = () => {
                 </button>
               </div>
               <div className="flex flex-col font-medium font-mluvka items-start gap-4 p-4">
-                <Link to="/" className="text-sm text-black hover:text-gray-700">Home</Link>
-                <Link to="/aboutus" className="text-sm text-black hover:text-gray-700">About Us</Link>
-                <Link to="/offers" className="text-sm text-black hover:text-gray-700">Offers</Link>
-                <Link to="/contactus" className="text-sm text-black hover:text-gray-700">Contact Us</Link>
+                <Link to="/" onClick={() => setMenuOpen(false)} className="text-sm text-black hover:text-gray-700">Home</Link>
+                <Link to="/aboutus" onClick={() => setMenuOpen(false)} className="text-sm text-black hover:text-gray-700">About Us</Link>
+                <Link to="/offers" onClick={() => setMenuOpen(false)} className="text-sm text-black hover:text-gray-700">Offers</Link>
+                <Link to="/contactus" onClick={() => setMenuOpen(false)} className="text-sm text-black hover:text-gray-700">Contact Us</Link>
               </div>
             </div>
           </>

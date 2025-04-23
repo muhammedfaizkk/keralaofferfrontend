@@ -40,8 +40,9 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
         }
 
         const validFiles = files.filter(file => {
-            if (!file.type.startsWith('image/')) {
-                toast.warning(`File ${file.name} is not an image and was skipped.`);
+            const acceptedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+            if (!acceptedTypes.includes(file.type)) {
+                toast.warning(`File ${file.name} is not a supported image format (PNG, JPG, JPEG, WebP).`);
                 return false;
             }
             if (file.size > 5 * 1024 * 1024) {
@@ -212,7 +213,7 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
                                                 'Click to upload or drag and drop'}
                                         </p>
                                         <p className="text-xs text-gray-500 mt-1">
-                                            PNG, JPG up to 5MB
+                                            PNG, JPG, WebP up to 5MB
                                         </p>
                                         <p className="text-xs text-blue-600 mt-1">
                                             {5 - existingImages.length - adsImages.length} slots remaining
@@ -220,7 +221,7 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
                                     </div>
                                     <input
                                         type="file"
-                                        accept="image/png, image/jpeg, image/jpg"
+                                        accept="image/png, image/jpeg, image/jpg, image/webp"
                                         multiple
                                         onChange={handleImageChange}
                                         className="hidden"

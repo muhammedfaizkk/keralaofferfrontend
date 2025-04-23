@@ -13,7 +13,10 @@ const InnerPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const imageRef = useRef(null);
   const sliderRef = useRef(null);
+  const thumbnailSliderRef = useRef(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [autoSwipe, setAutoSwipe] = useState(true);
+  const autoSwipeIntervalRef = useRef(null);
 
   // Fetch current ad details
   const { ad, loading: adLoading, error: adError } = useFetchAdById(id);
@@ -24,6 +27,56 @@ const InnerPage = () => {
     item._id !== id && 
     item.storeId?.category === ad?.storeId?.category
   ) || [];
+
+  // Auto swipe for main image
+  useEffect(() => {
+    if (ad?.adsImages?.length > 1 && autoSwipe) {
+      autoSwipeIntervalRef.current = setInterval(() => {
+        setCurrentImageIndex(prevIndex => 
+          prevIndex === ad.adsImages.length - 1 ? 0 : prevIndex + 1
+        );
+      }, 3000);
+    }
+
+    return () => {
+      if (autoSwipeIntervalRef.current) {
+        clearInterval(autoSwipeIntervalRef.current);
+      }
+    };
+  }, [ad?.adsImages, autoSwipe]);
+
+  // Reset autoswipe when ad changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [id]);
+
+  // Settings for thumbnail slider on mobile
+  const thumbnailSettings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    focusOnSelect: true,
+    arrows: false,
+    responsive: [
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 3.5,
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+        }
+      }
+    ]
+  };
 
   const handleWhatsApp = () => {
     if (!ad?.storeId?.contact) {
@@ -83,10 +136,16 @@ const InnerPage = () => {
     navigate(`/offerdetails/${offerId}`);
   };
 
+  const handleThumbnailClick = (index) => {
+    setCurrentImageIndex(index);
+    // Pause auto-swipe for a moment when manually selecting
+    setAutoSwipe(false);
+    setTimeout(() => setAutoSwipe(true), 5000);
+  };
+
   if (adLoading) {
     return (
       <div className="min-h-screen bg-gray-100 font-poppins">
-    
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-600"></div>
@@ -99,7 +158,6 @@ const InnerPage = () => {
   if (adError || !ad) {
     return (
       <div className="min-h-screen bg-gray-100 font-poppins">
-      
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <div className="text-red-500 text-lg mb-4">
@@ -120,8 +178,6 @@ const InnerPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 font-poppins">
-     
-
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Back Button and Category */}
@@ -142,11 +198,65 @@ const InnerPage = () => {
           {/* Left Column - Image Section */}
           <div className="space-y-4" ref={imageRef}>
             <div className="relative rounded-xl overflow-hidden bg-white shadow-md">
-              <img
-                src={ad.adsImages?.[currentImageIndex] || '/placeholder-image.jpg'}
-                alt={ad.description}
-                className="w-full h-64 md:h-96 object-cover"
-              />
+              {/* Main Image with Auto-swipe */}
+              <div className="relative aspect-square">
+                {ad.adsImages?.map((image, index) => (
+                  <div
+                    key={index}
+                    className={`absolute inset-0 transition-opacity duration-500 ${
+                      index === currentImageIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                    }`}
+                  >
+                    <img
+                      src={image || '/placeholder-image.jpg'}
+                      alt={`${ad.description} - image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+                
+                {/* Side navigation arrows for desktop */}
+                {ad.adsImages?.length > 1 && (
+                  <div className="absolute inset-0 flex items-center justify-between z-20 px-4 lg:px-6 opacity-0 hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => {
+                        setCurrentImageIndex(prev => prev === 0 ? ad.adsImages.length - 1 : prev - 1);
+                        setAutoSwipe(false);
+                        setTimeout(() => setAutoSwipe(true), 5000);
+                      }}
+                      className="h-10 w-10 rounded-full bg-white/70 flex items-center justify-center shadow-md hover:bg-white transition-colors"
+                    >
+                      <FaChevronLeft className="text-gray-800" />
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setCurrentImageIndex(prev => prev === ad.adsImages.length - 1 ? 0 : prev + 1);
+                        setAutoSwipe(false);
+                        setTimeout(() => setAutoSwipe(true), 5000);
+                      }}
+                      className="h-10 w-10 rounded-full bg-white/70 flex items-center justify-center shadow-md hover:bg-white transition-colors"
+                    >
+                      <FaChevronRight className="text-gray-800" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              {/* Indicators at bottom for mobile */}
+              {ad.adsImages?.length > 1 && (
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 lg:hidden">
+                  {ad.adsImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleThumbnailClick(index)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+              
               <div className="absolute top-4 right-4 flex space-x-2">
                 <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
                   {ad.offerType}
@@ -164,13 +274,13 @@ const InnerPage = () => {
               </div>
             </div>
 
-            {/* Thumbnail Navigation */}
+            {/* Thumbnail Navigation - Desktop Version */}
             {ad.adsImages?.length > 1 && (
-              <div className="flex justify-center gap-2">
+              <div className="hidden md:flex justify-center gap-2">
                 {ad.adsImages.map((image, index) => (
                   <button
                     key={index}
-                    onClick={() => setCurrentImageIndex(index)}
+                    onClick={() => handleThumbnailClick(index)}
                     className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all
                       ${index === currentImageIndex ? 'border-violet-500 shadow-lg' : 'border-transparent opacity-60'}`}
                   >
@@ -181,6 +291,34 @@ const InnerPage = () => {
                     />
                   </button>
                 ))}
+              </div>
+            )}
+
+            {/* Thumbnail Navigation - Mobile Version (Sliding) */}
+            {ad.adsImages?.length > 1 && (
+              <div className="md:hidden">
+                <Slider
+                  ref={thumbnailSliderRef}
+                  {...thumbnailSettings}
+                  className="thumbnail-slider"
+                  initialSlide={currentImageIndex}
+                >
+                  {ad.adsImages.map((image, index) => (
+                    <div key={index} className="px-1">
+                      <button
+                        onClick={() => handleThumbnailClick(index)}
+                        className={`w-full rounded-lg overflow-hidden border-2 transition-all aspect-square
+                          ${index === currentImageIndex ? 'border-violet-500 shadow-lg' : 'border-transparent opacity-60'}`}
+                      >
+                        <img
+                          src={image}
+                          alt={`Thumbnail ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </Slider>
               </div>
             )}
           </div>
@@ -334,8 +472,11 @@ const InnerPage = () => {
                   {
                     breakpoint: 640,
                     settings: {
-                      slidesToShow: 1,
+                      slidesToShow: 1.2,
                       slidesToScroll: 1,
+                      arrows: false,
+                      centerMode: true,
+                      centerPadding: '20px',
                     }
                   }
                 ]}
@@ -399,6 +540,19 @@ const InnerPage = () => {
           }
           .offer-slider .slick-slide > div {
             height: 100%;
+          }
+          .thumbnail-slider .slick-track {
+            display: flex !important;
+            margin-left: 0;
+          }
+          .thumbnail-slider .slick-slide {
+            height: inherit !important;
+            padding: 0 4px;
+          }
+          @media (max-width: 768px) {
+            .thumbnail-slider {
+              margin: 0 -4px;
+            }
           }
         `}</style>
       </div>
