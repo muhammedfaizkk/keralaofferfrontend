@@ -211,7 +211,7 @@ const Offers = () => {
               ) : (
                 <>
                   <div className="text-[14px] text-gray-600 mb-4 text-right">Total Offers: {filteredAds.length}</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredAds.map((ad) => (
                       <OfferCard
                         key={ad._id}

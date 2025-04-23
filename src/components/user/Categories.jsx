@@ -39,7 +39,7 @@ function Categories() {
         breakpoints={{
           320: { slidesPerView: 4 },
           768: { slidesPerView: 5 },
-          1024: { slidesPerView: 8},
+          1024: { slidesPerView: 10},
         }}
         loop={true}
         autoplay={{
