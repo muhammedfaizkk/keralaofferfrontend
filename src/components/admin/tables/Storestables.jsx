@@ -8,7 +8,7 @@ import DeleteConfirmation from "../../common/DeleteConfirmation"; // Import the 
 const Storestables = ({ stores, refetch, onEdit }) => {
   const { deleteStore, loading: deleteLoading } = useDeleteStore();
   const navigate = useNavigate();
-  const baseUrl = `http://localhost:5001`;
+  const BASE_URL = import.meta.env.VITE_BASE_URL
 
   // State for delete confirmation
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -82,7 +82,7 @@ const Storestables = ({ stores, refetch, onEdit }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{store.storeName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     <img
-                      src={store.logoUrl}
+                      src={`${BASE_URL}/${store.logoUrl}`}
                       alt={store.storeName}
                       className="w-12 h-12 object-cover rounded"
                     />

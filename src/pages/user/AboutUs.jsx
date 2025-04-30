@@ -3,41 +3,40 @@ import { Play } from 'lucide-react';
 
 const AboutUs = () => {
   return (
+    
     <>
       <div className="bg-white text-gray-800 font-sans">
         {/* Hero Section */}
         <div className="relative bg-black text-white">
-        <div className="absolute inset-0">
-          <img 
-            src="/Images/contact-hero.jpg" 
-            alt="Contact Us" 
-            className="w-full h-full object-cover opacity-50"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent"></div>
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 py-24">
-          <h1 className="text-5xl font-bold mb-4">About us</h1>
-          <div className="flex items-center text-blue-500">
-            <span>HOME</span>
-            <span className="mx-2">»</span>
-            <span>ABOUT US</span>
+          <div className="absolute inset-0">
+            <img 
+              src="/Images/contact-hero.jpg" 
+              alt="About Us" 
+              className="w-full h-full object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent"></div>
+          </div>
+          
+          <div className="relative max-w-7xl mx-auto px-4 py-24">
+            <h1 className="text-5xl font-bold mb-4">About Us</h1>
+            <div className="flex items-center text-blue-500">
+              <span>HOME</span>
+              <span className="mx-2">»</span>
+              <span>ABOUT US</span>
+            </div>
           </div>
         </div>
-      </div>
 
         {/* Testimonial Section */}
         <div className="bg-violet-100 text-gray-900 py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex flex-col items-center text-center">
-              <blockquote className="text-2xl md:text-3xl lg:text-4xl font-light mb-8 max-w-4xl italic">
-                "Working with <span className="font-semibold">Rufflevo</span> helped us realize projects that are creative and
-                researchable. Their work is always excellent. We enjoy how they build all the
-                study cases and make them like a puzzle. Then, we have the product like magic."
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="flex flex-col items-center">
+              <blockquote className="text-2xl md:text-3xl lg:text-4xl font-light mb-8 italic text-justify">
+                "Kerala Offer is Kerala's very own platform dedicated to bringing the best deals, offers, and discounts from local businesses directly to you. We are committed to making shopping smarter, easier, and more rewarding by connecting customers with genuine promotions from shops, service providers, and brands across the state."
               </blockquote>
               <div>
-                <p className="font-semibold text-xl">Jacon Somber</p>
-                <p className="text-gray-600">Founder of Narina Studio</p>
+                <p className="font-semibold text-xl">Kerala Offer</p>
+                <p className="text-gray-600">Your Local Savings Platform</p>
               </div>
             </div>
           </div>
@@ -56,8 +55,8 @@ const AboutUs = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold mb-4">Our Vision</h3>
-                <p className="text-gray-700">
-                  To be the leading technology solutions provider, transforming businesses through innovative digital solutions and creating lasting value for our clients worldwide.
+                <p className="text-gray-700 text-justify">
+                  To build Kerala's most trusted and loved offer platform that uplifts local businesses and delivers unmatched value to customers.
                 </p>
               </div>
 
@@ -69,9 +68,11 @@ const AboutUs = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold mb-4">Our Mission</h3>
-                <p className="text-gray-700">
-                  To empower businesses with cutting-edge technology solutions that drive growth, efficiency, and innovation while maintaining the highest standards of quality and customer satisfaction.
-                </p>
+                <ul className="text-gray-700 space-y-2">
+                  <li className="text-justify">• Promote local businesses with digital space</li>
+                  <li className="text-justify">• Empower customers with genuine deals</li>
+                  <li className="text-justify">• Create a thriving local economy</li>
+                </ul>
               </div>
 
               {/* Values */}
@@ -81,13 +82,10 @@ const AboutUs = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Our Values</h3>
-                <ul className="text-gray-700 space-y-2">
-                  <li>• Innovation & Excellence</li>
-                  <li>• Customer-Centric Approach</li>
-                  <li>• Integrity & Transparency</li>
-                  <li>• Continuous Improvement</li>
-                </ul>
+                <h3 className="text-xl font-semibold mb-4">Who We Are</h3>
+                <p className="text-gray-700 text-justify">
+                  Kerala Offer is a venture proudly operated under Amira Dude & Co LLP, founded by Shanu Krishnan and Amrutha Raghavan. We believe that every deal is more than just a discount — it's a way to celebrate local talent, support entrepreneurship, and bring smiles to everyday life.
+                </p>
               </div>
             </div>
           </div>

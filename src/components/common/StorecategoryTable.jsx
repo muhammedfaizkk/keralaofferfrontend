@@ -2,6 +2,7 @@ import React from "react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 const StorecategoryTable = ({ categories = [], onDeleteClick, onEditClick }) => {
+  const BASE_URL = import.meta.env.VITE_BASE_URL
   return (
     <div className="py-6">
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -20,7 +21,7 @@ const StorecategoryTable = ({ categories = [], onDeleteClick, onEditClick }) => 
                 <tr key={cat._id || index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    <img className="w-20" src={cat.catPhotographs} alt="" />
+                    <img className="w-20" src={`${BASE_URL}/${cat.catPhotographs}`} alt="" />
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700">{cat.title}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">

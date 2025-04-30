@@ -15,7 +15,7 @@ function Banners() {
   const { deleteBanner } = useDeleteBanner();
   const location = useLocation();
   const navigate = useNavigate();
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const formatSegment = (segment) =>
     segment.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
@@ -38,7 +38,7 @@ function Banners() {
     setSelectedBanner(null);
   };
 
-  // Display all banners by default or filter based on search term
+ 
   const filteredBanners = searchTerm
     ? banners.filter((banner) =>
         banner?.heading?.toLowerCase().includes(searchTerm.toLowerCase())

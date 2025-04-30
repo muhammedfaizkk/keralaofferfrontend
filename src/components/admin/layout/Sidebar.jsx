@@ -63,9 +63,11 @@ const Sidebar = ({ isOpen, onClose }) => {
         </button>
 
         {/* Logo */}
-        <div className="mt-12 md:mt-0 mb-4 flex justify-center">
-          <img src="/logonav.png" className="h-16 w-auto" alt="Logo" />
-        </div>
+        <img
+          src="/keralaofferlogo.svg"
+          alt="Kerala Offer Logo"
+          className="h-[50px] sm:h-[60px] xl:h-[70px] w-auto object-contain"
+        />
 
         {/* Navigation */}
         <nav className="space-y-1">
@@ -102,7 +104,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             {dropdowns.banners && (
               <div className="ml-10 transition-all duration-300 ease-in-out">
                 <div onClick={() => navigateTo('/admin/banners')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">All Banners</div>
-                
+
               </div>
             )}
           </div>

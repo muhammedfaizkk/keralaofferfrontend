@@ -1,5 +1,4 @@
-"use client"
-
+import React from 'react';
 import { useState, useRef, useEffect, useMemo } from "react"
 import { Search, ChevronDown, X, Filter, RefreshCw, Share2, Copy } from "lucide-react"
 import {
@@ -45,7 +44,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
     // Map filter keys to URL parameter names
     const paramMap = {
-      "All Stores": "store",
+      "All Stores": "storeName",
       "All Categories": "category",
       "All Districts": "district",
       "All Locations": "location",
@@ -53,8 +52,8 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     }
 
     Object.entries(selectedValues).forEach(([key, value]) => {
-      if (value && value.label && paramMap[key]) {
-        params.append(paramMap[key], value.label)
+      if (value && value.id && paramMap[key]) {
+        params.append(paramMap[key], value.id)
       }
     })
 
@@ -107,7 +106,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
       case "categories":
         return rawData.map((item) => ({
           id: item._id || item.id,
-          label: item.title || item.category,
+          label: item.category || item.title,
           originalData: item,
         }))
 
@@ -128,7 +127,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
       case "stores":
         return rawData.map((item) => ({
-          id: item._id || item.id,
+          id: item._id,
           label: item.storeName,
           originalData: item,
         }))
@@ -150,9 +149,9 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         id: "stores",
         label: "All Stores",
         data: processedStoreNames,
-        icon: "🏪",
+        icon: "\uD83C\uDFEA",
         loading: storesLoading,
-        paramName: "store",
+        paramName: "storeName",
       },
       {
         id: "categories",
@@ -161,6 +160,10 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         icon: "📑",
         loading: categoriesLoading,
         paramName: "category",
+        filterBy: (category, filters) => {
+          // Add any category-specific filtering logic here if needed
+          return true;
+        },
       },
       {
         id: "districts",
@@ -227,10 +230,19 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         const paramValue = searchParams.get(item.paramName)
         if (!paramValue) return
 
-        const matchedOption = item.data.find((option) => option.label.toLowerCase() === paramValue.toLowerCase())
-
-        if (matchedOption) {
-          newFilters[item.label] = matchedOption
+        // For storeName, match by label instead of id
+        if (item.paramName === "storeName") {
+          const matchedOption = item.data.find((option) => 
+            option.label.toLowerCase() === decodeURIComponent(paramValue).toLowerCase()
+          )
+          if (matchedOption) {
+            newFilters[item.label] = matchedOption
+          }
+        } else {
+          const matchedOption = item.data.find((option) => option.id === paramValue)
+          if (matchedOption) {
+            newFilters[item.label] = matchedOption
+          }
         }
       })
 
@@ -344,7 +356,6 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
   // Update URL when filters change
   const updateURLWithFilters = (newValues, newQuery) => {
-    // Create new URL parameters
     const params = new URLSearchParams()
 
     // Add search query if exists
@@ -354,12 +365,19 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
     // Add selected filters
     Object.entries(newValues).forEach(([key, value]) => {
-      if (!value || !value.label) return
+      if (!value || !value.id) return
 
       // Find param name for this filter
       const dropdownItem = dropdownItems.find((item) => item.label === key)
       if (dropdownItem?.paramName) {
-        params.set(dropdownItem.paramName, value.label)
+        // For storeName, use the id (ObjectId)
+        if (dropdownItem.paramName === "storeName") {
+          params.set(dropdownItem.paramName, value.id)
+        } else if (dropdownItem.paramName === "category") {
+          params.set(dropdownItem.paramName, value.label)
+        } else {
+          params.set(dropdownItem.paramName, value.id)
+        }
       }
     })
 
@@ -376,6 +394,49 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   const handleSelect = (dropdownLabel, option) => {
     if (!option) return
 
+    // For stores, ensure we're using the store name
+    if (dropdownLabel === "All Stores") {
+      const newValues = {
+        ...selectedValues,
+        [dropdownLabel]: {
+          id: option.label,  // Use label as id for consistency
+          label: option.label,
+          originalData: option.originalData,
+        },
+      }
+      setSelectedValues(newValues)
+      setDropdownOpen(null)
+
+      // Update URL with store name
+      const params = new URLSearchParams(location.search)
+      params.set("storeName", option.label)
+      if (searchQuery) {
+        params.set("q", searchQuery)
+      }
+
+      // Log the values being set
+      console.log('Setting store filter:', {
+        storeName: option.label,
+        newValues
+      });
+
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      )
+
+      // Ensure we pass the correct format to parent
+      onFilterChange?.({
+        ...newValues,
+        searchQuery,
+      })
+      return
+    }
+
+    // For other filters
     const newValues = {
       ...selectedValues,
       [dropdownLabel]: {
@@ -383,15 +444,6 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         label: option.label,
         originalData: option.originalData,
       },
-    }
-
-    // If district changed, clear location if it doesn't match the new district
-    if (dropdownLabel === "All Districts" && selectedValues["All Locations"]) {
-      const locationDistrict = processedLocations.find((loc) => loc.id === selectedValues["All Locations"].id)?.district
-
-      if (locationDistrict !== option.label) {
-        delete newValues["All Locations"]
-      }
     }
 
     setSelectedValues(newValues)
@@ -709,7 +761,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
                   </div>
                 </div>
 
-                {/* Results count */}
+                
                 <div className="w-full flex flex-wrap justify-between items-center">
                   {totalResults !== undefined && (
                     <div className="px-3 sm:px-6 mt-4 text-sm text-gray-600">

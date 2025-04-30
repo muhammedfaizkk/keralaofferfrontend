@@ -1,17 +1,32 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
-export const useFetchAds = () => {
+export const useFetchAds = (page = 1, filters = {}) => {
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(page);
 
-    const fetchAdsWithStore = async () => {
+    const fetchAdsWithStore = async (pageNumber = 1, filtersObj = filters) => {
         try {
             setLoading(true);
             setError(null);
-            const response = await axiosInstance.get('/storeads/adswithstore');
-            setAds(response.data);
+
+            // Build query string from filters
+            const params = new URLSearchParams({ page: pageNumber });
+            if (filtersObj.storeName) params.append('storeName', filtersObj.storeName);
+            if (filtersObj.category) params.append('category', filtersObj.category);
+            if (filtersObj.district) params.append('district', filtersObj.district);
+            if (filtersObj.location) params.append('location', filtersObj.location);
+            if (filtersObj.offerType) params.append('offerType', filtersObj.offerType);
+
+            console.log('Sending filters to API:', Object.fromEntries(params.entries()));
+
+            const response = await axiosInstance.get(`/storeads/adswithstore?${params.toString()}`);
+            setAds(response.data.data || []);
+            setTotalPages(response.data.totalPages || 1);
+            setCurrentPage(response.data.currentPage || 1);
         } catch (error) {
             console.error('Error fetching ads:', error);
             setError(error.response?.data?.message || 'Failed to fetch ads');
@@ -21,10 +36,18 @@ export const useFetchAds = () => {
     };
 
     useEffect(() => {
-        fetchAdsWithStore();
-    }, []);
+        fetchAdsWithStore(page, filters);
+        // eslint-disable-next-line
+    }, [page, JSON.stringify(filters)]);
 
-    return { ads, loading, error, refetch: fetchAdsWithStore };
+    return {
+        ads,
+        loading,
+        error,
+        totalPages,
+        currentPage,
+        setPage: fetchAdsWithStore // You can call this to change pages
+    };
 };
 
 export const useFetchStoreAds = (storeId) => {

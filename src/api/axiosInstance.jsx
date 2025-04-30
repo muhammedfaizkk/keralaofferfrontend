@@ -2,12 +2,11 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://keralaoffersbackend.onrender.com/api',
+  baseURL: `${import.meta.env.VITE_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
 });
-
 
 axiosInstance.interceptors.request.use(
   (config) => {

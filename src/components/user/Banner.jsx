@@ -6,7 +6,7 @@ function Banner() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Filter banners by type
+  const BASE_URL = import.meta.env.VITE_BASE_URL
   const desktopBanners = banners.filter((b) => b.title === 'desktop');
   const mobileBanners = banners.filter((b) => b.title === 'mobile');
 
@@ -70,7 +70,7 @@ function Banner() {
         {desktopBannerImage && (
           <div className="hidden sm:block w-full h-[500px] overflow-hidden">
             <img
-              src={desktopBannerImage}
+              src={`${BASE_URL}/${desktopBannerImage}`}
               alt="Desktop Banner"
               className={`w-full h-full object-cover ${isTransitioning ? 'scale-105' : 'scale-100'}`}
               style={{
@@ -86,7 +86,7 @@ function Banner() {
         {mobileBannerImage && (
           <div className="block sm:hidden w-full h-[70vh] overflow-hidden">
             <img
-              src={mobileBannerImage}
+              src={`${BASE_URL}/${mobileBannerImage}`}
               alt="Mobile Banner"
               className={`w-full h-full object-cover ${isTransitioning ? 'scale-105' : 'scale-100'}`}
               style={{

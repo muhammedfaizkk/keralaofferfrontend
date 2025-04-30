@@ -14,7 +14,7 @@ function Stores() {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const { stores, loading, error, refetch } = useGetStore();
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL
   // Extract unique locations for filter dropdown
   const locations = [...new Set(stores?.map(store => store.location?.name).filter(Boolean))];
 

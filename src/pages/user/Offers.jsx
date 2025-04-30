@@ -1,45 +1,143 @@
+import React from 'react';
 import { useEffect, useState } from "react"
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom"
 import OfferCard from "../../components/user/OfferCard"
 import SearchFilters from "../../components/user/SearchFilters"
 import { useFetchAds } from "../../hooks/user/Userads"
 import { toast } from "react-toastify"
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa"
 
 const Offers = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { ads, loading: adsLoading, error: adsError, refetch: refetchAds } = useFetchAds()
-  const [filteredAds, setFilteredAds] = useState([])
+  const currentPage = parseInt(searchParams.get("page")) || 1
+  
+  const getFiltersFromParams = (searchParams) => {
+    const filters = {};
+    
+    // Get storeName from the selected store filter
+    const storeName = searchParams.get('storeName');
+    if (storeName) filters.storeName = storeName;
+    
+    // Get other filters
+    const category = searchParams.get('category');
+    if (category) filters.category = category;
+    
+    const district = searchParams.get('district');
+    if (district) filters.district = district;
+    
+    const location = searchParams.get('location');
+    if (location) filters.location = location;
+    
+    const offerType = searchParams.get('offerType');
+    if (offerType) filters.offerType = offerType;
+
+    console.log('Filters being sent to backend:', filters);
+    return filters;
+  };
+
+  const backendFilters = getFiltersFromParams(searchParams);
+
+  const { ads = [], loading: adsLoading, error: adsError, totalPages, currentPage: serverPage, setPage } = useFetchAds(currentPage, backendFilters);
   const [likedOffers, setLikedOffers] = useState({})
   const [showExpired, setShowExpired] = useState(searchParams.get("showExpired") === "true")
 
-  // Get initial filters from URL parameters - standardize parameter names
+  // Update getInitialFilters to properly handle store selection
   const getInitialFilters = () => {
+    const storeName = searchParams.get("storeName");
     return {
       searchQuery: searchParams.get("search") || "",
-      "All Stores": searchParams.get("store") ? { label: searchParams.get("store") } : null,
-      "All Categories": searchParams.get("category") ? { label: searchParams.get("category") } : null,
-      "All Districts": searchParams.get("district") ? { label: searchParams.get("district") } : null,
-      "All Locations": searchParams.get("location") ? { label: searchParams.get("location") } : null,
-      "All Offer Types": searchParams.get("offerType") ? { label: searchParams.get("offerType") } : null,
+      "All Stores": storeName ? { 
+        id: storeName,  // Use storeName as id
+        label: storeName,
+        originalData: { storeName } 
+      } : null,
+      "All Categories": searchParams.get("category") ? { 
+        label: searchParams.get("category") 
+      } : null,
+      "All Districts": searchParams.get("district") ? { 
+        label: searchParams.get("district") 
+      } : null,
+      "All Locations": searchParams.get("location") ? { 
+        label: searchParams.get("location") 
+      } : null,
+      "All Offer Types": searchParams.get("offerType") ? { 
+        label: searchParams.get("offerType") 
+      } : null,
     };
   };
   
   const [filters, setFilters] = useState(getInitialFilters())
 
+  console.log('ads-------->',ads);
+  
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return
+    
+    // Update URL with new page number while preserving other params
+    const newParams = new URLSearchParams(searchParams)
+    newParams.set("page", newPage.toString())
+    setSearchParams(newParams)
+    
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   // Update URL when filters change - standardize parameter names
   const updateUrlParams = (newFilters, newShowExpired) => {
-    const params = new URLSearchParams()
+    // Start with existing params to preserve them
+    const params = new URLSearchParams(searchParams)
 
-    if (newFilters.searchQuery) params.set("search", newFilters.searchQuery)
-    if (newFilters["All Stores"]?.label) params.set("store", newFilters["All Stores"].label)
-    if (newFilters["All Categories"]?.label) params.set("category", newFilters["All Categories"].label)
-    if (newFilters["All Districts"]?.label) params.set("district", newFilters["All Districts"].label)
-    if (newFilters["All Locations"]?.label) params.set("location", newFilters["All Locations"].label)
-    if (newFilters["All Offer Types"]?.label) params.set("offerType", newFilters["All Offer Types"].label)
-    if (newShowExpired) params.set("showExpired", "true")
+    // Reset to page 1 when filters change
+    params.set("page", "1")
 
+    // Update or remove search params based on new filters
+    if (newFilters.searchQuery) {
+      params.set("search", newFilters.searchQuery)
+    } else {
+      params.delete("search")
+    }
+
+    // Handle store name
+    if (newFilters["All Stores"]?.label) {
+      params.set("storeName", newFilters["All Stores"].label)
+    } else {
+      params.delete("storeName")
+    }
+
+    // Handle other filters
+    if (newFilters["All Categories"]?.label) {
+      params.set("category", newFilters["All Categories"].label)
+    } else {
+      params.delete("category")
+    }
+
+    if (newFilters["All Districts"]?.label) {
+      params.set("district", newFilters["All Districts"].label)
+    } else {
+      params.delete("district")
+    }
+
+    if (newFilters["All Locations"]?.label) {
+      params.set("location", newFilters["All Locations"].label)
+    } else {
+      params.delete("location")
+    }
+
+    if (newFilters["All Offer Types"]?.label) {
+      params.set("offerType", newFilters["All Offer Types"].label)
+    } else {
+      params.delete("offerType")
+    }
+
+    if (newShowExpired) {
+      params.set("showExpired", "true")
+    } else {
+      params.delete("showExpired")
+    }
+
+    console.log('Updating URL params:', Object.fromEntries(params.entries()));
     setSearchParams(params)
   }
 
@@ -66,77 +164,6 @@ const Offers = () => {
       toast.error("Failed to copy filter URL")
     }
   }
-
-  // Apply filters to ads
-  const applyFilters = (filters, ads) => {
-    if (!ads || !Array.isArray(ads)) return []
-
-    let filtered = [...ads]
-    const now = new Date()
-
-    // First filter out expired offers if not showing them
-    if (!showExpired) {
-      filtered = filtered.filter((ad) => {
-        const endDate = new Date(ad.endDate)
-        return endDate > now
-      })
-    }
-
-    // Apply search query filter
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase()
-      filtered = filtered.filter((ad) => {
-        const description = ad.description?.toLowerCase() || ""
-        const storeName = ad.storeId?.storeName?.toLowerCase() || ""
-        const category = ad.storeId?.category?.toLowerCase() || ""
-        return description.includes(query) || storeName.includes(query) || category.includes(query)
-      })
-    }
-
-    // Apply store filter
-    if (filters["All Stores"]?.label) {
-      filtered = filtered.filter((ad) => ad.storeId?.storeName === filters["All Stores"].label)
-    }
-
-    // Apply category filter
-    if (filters["All Categories"]?.label) {
-      filtered = filtered.filter((ad) => ad.storeId?.category === filters["All Categories"].label)
-    }
-
-    // Apply district filter
-    if (filters["All Districts"]?.label) {
-      filtered = filtered.filter((ad) => ad.storeId?.district === filters["All Districts"].label)
-    }
-
-    // Apply location filter
-    if (filters["All Locations"]?.label) {
-      filtered = filtered.filter((ad) => ad.storeId?.location === filters["All Locations"].label)
-    }
-
-    // Apply offer type filter
-    if (filters["All Offer Types"]?.label) {
-      filtered = filtered.filter((ad) => ad.offerType === filters["All Offer Types"].label)
-    }
-
-    // Sort by end date (soonest ending first)
-    return filtered.sort((a, b) => new Date(a.endDate) - new Date(b.endDate))
-  }
-
-  // Initialize filters and handle ads updates
-  useEffect(() => {
-    if (ads) {
-      const filteredResults = applyFilters(filters, ads)
-      setFilteredAds(filteredResults)
-    }
-  }, [ads, filters, showExpired])
-
-  // Update filters when URL params change
-  useEffect(() => {
-    const newFilters = getInitialFilters()
-    setFilters(newFilters)
-    // When URL changes but not because of our setSearchParams, also update showExpired state
-    setShowExpired(searchParams.get("showExpired") === "true")
-  }, [location.search])
 
   const handleOfferClick = (adId) => {
     navigate(`/offer/${adId}`)
@@ -167,7 +194,7 @@ const Offers = () => {
       <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
         <SearchFilters
           onFilterChange={handleFilterChange}
-          totalResults={filteredAds.length}
+          totalResults={ads.length}
           initialFilters={filters}
           handleShareFilters={handleShareFilters}
           searchParams={searchParams}
@@ -200,25 +227,25 @@ const Offers = () => {
 
           {!adsLoading && !adsError && (
             <>
-              {filteredAds.length === 0 ? (
+              {ads.length === 0 ? (
                 <div className="flex justify-center items-center h-64">
                   <div className="text-[16px] text-gray-500 text-center">
-                    {showExpired
-                      ? "No offers found matching your criteria."
-                      : "No active offers found matching your criteria. Try showing expired offers or adjusting your filters."}
+                    No offers found matching your criteria.
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="text-[14px] text-gray-600 mb-4 text-right">Total Offers: {filteredAds.length}</div>
+                  <div className="text-[14px] text-gray-600 mb-4 text-right">
+                    Total Offers: {ads.length}
+                  </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredAds.map((ad) => (
+                    {ads.map((ad) => (
                       <OfferCard
                         key={ad._id}
                         offer={{
                           ...ad,
                           image: ad.adsImages?.[0],
-                          store: ad.storeId,
+                          store: ad.storeName,
                         }}
                         isLiked={likedOffers[ad._id]}
                         onLikeToggle={() => toggleLike(ad._id)}
@@ -227,6 +254,64 @@ const Offers = () => {
                       />
                     ))}
                   </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex justify-center items-center gap-2">
+                      <button
+                        onClick={() => handlePageChange(serverPage - 1)}
+                        disabled={serverPage === 1}
+                        className={`p-2 rounded-full ${
+                          serverPage === 1
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-violet-100 text-violet-600 hover:bg-violet-200'
+                        } transition-colors`}
+                      >
+                        <FaChevronLeft className="w-5 h-5" />
+                      </button>
+
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                          .filter(page => {
+                            // Show first page, last page, current page, and pages around current page
+                            return (
+                              page === 1 ||
+                              page === totalPages ||
+                              Math.abs(page - serverPage) <= 1
+                            )
+                          })
+                          .map((page, index, array) => (
+                            <React.Fragment key={page}>
+                              {index > 0 && array[index - 1] !== page - 1 && (
+                                <span className="px-2 text-gray-400">...</span>
+                              )}
+                              <button
+                                onClick={() => handlePageChange(page)}
+                                className={`w-10 h-10 rounded-full ${
+                                  serverPage === page
+                                    ? 'bg-violet-600 text-white'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-violet-100'
+                                } transition-colors text-sm font-medium`}
+                              >
+                                {page}
+                              </button>
+                            </React.Fragment>
+                          ))}
+                      </div>
+
+                      <button
+                        onClick={() => handlePageChange(serverPage + 1)}
+                        disabled={serverPage === totalPages}
+                        className={`p-2 rounded-full ${
+                          serverPage === totalPages
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-violet-100 text-violet-600 hover:bg-violet-200'
+                        } transition-colors`}
+                      >
+                        <FaChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </>

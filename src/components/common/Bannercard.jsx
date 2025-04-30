@@ -2,13 +2,13 @@ import React from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 
 function Bannercard({ banner, onDelete }) {
-  console.log('banner------->',banner);
+  const BASE_URL = import.meta.env.VITE_BASE_URL
   
   return (
     <div className="relative group w-full max-w-sm rounded overflow-hidden shadow hover:shadow-lg transition duration-300">
       {/* Display banner image */}
       <img
-        src={`${banner.bannerImage[0]}`} // Full path to the image
+        src={`${BASE_URL}${banner.bannerImage[0]}`} // Full path to the image
         alt={banner.title || 'Banner'}
         className="w-full h-48 object-cover"
       />

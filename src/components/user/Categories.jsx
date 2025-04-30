@@ -9,7 +9,7 @@ function Categories() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const navigate = useNavigate();
   const { categories, loading, error } = useGetstorecategory();
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL
   const handleSelect = (index, categoryTitle) => {
     setSelectedIndex(index);
     navigate(`/offers?category=${encodeURIComponent(categoryTitle)}`);
@@ -60,7 +60,7 @@ function Categories() {
                   w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24`}
               >
                 <img
-                  src={category.catPhotographs[0]}
+                  src={`${BASE_URL}/${category.catPhotographs[0]}`}
                   alt={category.title}
                   className="w-full h-full object-cover"
                 />

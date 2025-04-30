@@ -8,22 +8,17 @@ const Header = () => {
 
   return (
     <>
-      {/* Top Header with Shadow Box */}
       <header className="bg-white">
-        <div className="max-w-[1450px] mx-auto pt-4 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1450px] mx-auto  px-4 sm:px-6 lg:px-8">
           <div className="rounded-xl shadow-sm flex justify-between items-center px-3 sm:px-6 py-2 relative">
-            {/* Logo in box */}
             <div className="flex items-center gap-2 rounded-md px-3 py-2">
               <Link to="/">
                 <img
-                  src="/logonav.png"
+                  src="/keralaofferlogo.svg"
                   alt="Kerala Offer Logo"
-                  className="w-[120px] h-[35px] object-contain 
-                    sm:w-[140px] sm:h-[40px] 
-                    md:w-[160px] md:h-[45px] 
-                    lg:w-[180px] lg:h-[50px] 
-                    xl:w-[200px] xl:h-[55px]"
+                  className="h-[50px] sm:h-[60px] xl:h-[70px] w-auto object-contain"
                 />
+
               </Link>
             </div>
 

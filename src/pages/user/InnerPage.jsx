@@ -6,6 +6,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useFetchAdById, useFetchAds } from '../../hooks/user/Userads';
 import { toast } from 'react-toastify';
+import OfferCard from '../../components/user/OfferCard';
 
 const InnerPage = () => {
   const navigate = useNavigate();
@@ -18,13 +19,13 @@ const InnerPage = () => {
   const [autoSwipe, setAutoSwipe] = useState(true);
   const autoSwipeIntervalRef = useRef(null);
 
-  // Fetch current ad details
+  const BASE_URL = import.meta.env.VITE_BASE_URL
   const { ad, loading: adLoading, error: adError } = useFetchAdById(id);
-  
+
   // Fetch related ads
   const { ads: allAds, loading: relatedLoading } = useFetchAds();
-  const relatedAds = allAds?.filter(item => 
-    item._id !== id && 
+  const relatedAds = allAds?.filter(item =>
+    item._id !== id &&
     item.storeId?.category === ad?.storeId?.category
   ) || [];
 
@@ -32,7 +33,7 @@ const InnerPage = () => {
   useEffect(() => {
     if (ad?.adsImages?.length > 1 && autoSwipe) {
       autoSwipeIntervalRef.current = setInterval(() => {
-        setCurrentImageIndex(prevIndex => 
+        setCurrentImageIndex(prevIndex =>
           prevIndex === ad.adsImages.length - 1 ? 0 : prevIndex + 1
         );
       }, 3000);
@@ -120,7 +121,7 @@ const InnerPage = () => {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return 'Date not available';
-      
+
       return date.toLocaleDateString('en-IN', {
         day: 'numeric',
         month: 'short',
@@ -194,107 +195,112 @@ const InnerPage = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Image Section */}
-          <div className="space-y-4" ref={imageRef}>
-            <div className="relative rounded-xl overflow-hidden bg-white shadow-md">
-              {/* Main Image with Auto-swipe */}
-              <div className="relative aspect-square">
-                {ad.adsImages?.map((image, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 transition-opacity duration-500 ${
-                      index === currentImageIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                    }`}
-                  >
-                    <img
-                      src={image || '/placeholder-image.jpg'}
-                      alt={`${ad.description} - image ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-                
-                {/* Side navigation arrows for desktop */}
-                {ad.adsImages?.length > 1 && (
-                  <div className="absolute inset-0 flex items-center justify-between z-20 px-4 lg:px-6 opacity-0 hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => {
-                        setCurrentImageIndex(prev => prev === 0 ? ad.adsImages.length - 1 : prev - 1);
-                        setAutoSwipe(false);
-                        setTimeout(() => setAutoSwipe(true), 5000);
-                      }}
-                      className="h-10 w-10 rounded-full bg-white/70 flex items-center justify-center shadow-md hover:bg-white transition-colors"
-                    >
-                      <FaChevronLeft className="text-gray-800" />
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setCurrentImageIndex(prev => prev === ad.adsImages.length - 1 ? 0 : prev + 1);
-                        setAutoSwipe(false);
-                        setTimeout(() => setAutoSwipe(true), 5000);
-                      }}
-                      className="h-10 w-10 rounded-full bg-white/70 flex items-center justify-center shadow-md hover:bg-white transition-colors"
-                    >
-                      <FaChevronRight className="text-gray-800" />
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              {/* Indicators at bottom for mobile */}
+          <div className="lg:col-span-2 space-y-4" ref={imageRef}>
+            {/* Main Image Container with Left Thumbnails */}
+            <div className="flex gap-4">
+              {/* Left Thumbnails - Desktop Version */}
               {ad.adsImages?.length > 1 && (
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 lg:hidden">
-                  {ad.adsImages.map((_, index) => (
+                <div className="hidden md:flex flex-col gap-2 w-20">
+                  {ad.adsImages.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => handleThumbnailClick(index)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        index === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'
-                      }`}
-                    />
+                      className={`w-full rounded-lg overflow-hidden border-2 transition-all
+                        ${index === currentImageIndex ? 'border-violet-500 shadow-lg' : 'border-transparent opacity-60'}`}
+                    >
+                      <div className="relative w-full" style={{ paddingBottom: '100%' }}>
+                        <img
+                          src={`${BASE_URL}/${image}`}
+                          alt={`Thumbnail ${index + 1}`}
+                          className="absolute inset-0 w-full h-full object-cover bg-gray-50"
+                        />
+                      </div>
+                    </button>
                   ))}
                 </div>
               )}
-              
-              <div className="absolute top-4 right-4 flex space-x-2">
-                <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-                  {ad.offerType}
-                </span>
-                <button
-                  onClick={() => setIsLiked(!isLiked)}
-                  className="p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform"
-                >
-                  {isLiked ? (
-                    <FaHeart className="text-red-500 w-5 h-5" />
-                  ) : (
-                    <FaRegHeart className="text-gray-600 w-5 h-5" />
+
+              {/* Main Image Container */}
+              <div className="flex-1 relative rounded-xl overflow-hidden bg-white shadow-md">
+                {/* Main Image with Auto-swipe */}
+                <div className="relative w-full" style={{ paddingBottom: '100%' }}>
+                  {ad.adsImages?.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`absolute inset-0 transition-opacity duration-500 ${index === currentImageIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                        }`}
+                    >
+                      <img
+                        src={`${BASE_URL}/${image}` || '/placeholder-image.jpg'}
+                        alt={`${ad.description} - image ${index + 1}`}
+                        className="absolute inset-0 w-full h-full object-contain bg-gray-50"
+                      />
+                    </div>
+                  ))}
+
+                  {/* Side navigation arrows for desktop */}
+                  {ad.adsImages?.length > 1 && (
+                    <div className="absolute inset-0 flex items-center justify-between z-20 px-4 lg:px-6 opacity-0 hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          setCurrentImageIndex(prev => prev === 0 ? ad.adsImages.length - 1 : prev - 1);
+                          setAutoSwipe(false);
+                          setTimeout(() => setAutoSwipe(true), 5000);
+                        }}
+                        className="h-10 w-10 rounded-full bg-white/70 flex items-center justify-center shadow-md hover:bg-white transition-colors"
+                      >
+                        <FaChevronLeft className="text-gray-800" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentImageIndex(prev => prev === ad.adsImages.length - 1 ? 0 : prev + 1);
+                          setAutoSwipe(false);
+                          setTimeout(() => setAutoSwipe(true), 5000);
+                        }}
+                        className="h-10 w-10 rounded-full bg-white/70 flex items-center justify-center shadow-md hover:bg-white transition-colors"
+                      >
+                        <FaChevronRight className="text-gray-800" />
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
+
+                {/* Indicators at bottom for mobile */}
+                {ad.adsImages?.length > 1 && (
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20 lg:hidden">
+                    {ad.adsImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleThumbnailClick(index)}
+                        className={`w-2 h-2 rounded-full transition-all ${index === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'
+                          }`}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Offer type badge and like button */}
+                <div className="absolute top-4 right-4 flex space-x-2 z-20">
+                  <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                    {ad.offerType}
+                  </span>
+                  <button
+                    onClick={() => setIsLiked(!isLiked)}
+                    className="p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform"
+                  >
+                    {isLiked ? (
+                      <FaHeart className="text-red-500 w-5 h-5" />
+                    ) : (
+                      <FaRegHeart className="text-gray-600 w-5 h-5" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Thumbnail Navigation - Desktop Version */}
-            {ad.adsImages?.length > 1 && (
-              <div className="hidden md:flex justify-center gap-2">
-                {ad.adsImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleThumbnailClick(index)}
-                    className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all
-                      ${index === currentImageIndex ? 'border-violet-500 shadow-lg' : 'border-transparent opacity-60'}`}
-                  >
-                    <img
-                      src={image}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Thumbnail Navigation - Mobile Version (Sliding) */}
+            {/* Thumbnail Slider - Mobile Version */}
             {ad.adsImages?.length > 1 && (
               <div className="md:hidden">
                 <Slider
@@ -307,14 +313,16 @@ const InnerPage = () => {
                     <div key={index} className="px-1">
                       <button
                         onClick={() => handleThumbnailClick(index)}
-                        className={`w-full rounded-lg overflow-hidden border-2 transition-all aspect-square
+                        className={`w-full rounded-lg overflow-hidden border-2 transition-all
                           ${index === currentImageIndex ? 'border-violet-500 shadow-lg' : 'border-transparent opacity-60'}`}
                       >
-                        <img
-                          src={image}
-                          alt={`Thumbnail ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
+                        <div className="relative w-full" style={{ paddingBottom: '100%' }}>
+                          <img
+                            src={`${BASE_URL}/${image}`}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="absolute inset-0 w-full h-full object-cover bg-gray-50"
+                          />
+                        </div>
                       </button>
                     </div>
                   ))}
@@ -328,25 +336,27 @@ const InnerPage = () => {
             {/* Title and Store Section */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-3">
-                <img
-                  src={ad.storeId?.logoUrl || '/store-placeholder.png'}
-                  alt={ad.storeId?.storeName}
-                  className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                />
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                  <img
+                    src={`${BASE_URL}/${ad.storeId?.logoUrl}` || '/store-placeholder.png'}
+                    alt={ad.storeId?.storeName}
+                    className="w-full h-full object-cover border border-gray-200"
+                  />
+                </div>
                 <div>
                   <span className="font-medium text-base text-gray-900">{ad.storeId?.storeName}</span>
                   <p className="text-xs text-gray-500">{ad.storeId?.location}, {ad.storeId?.district}</p>
                 </div>
               </div>
-              
+
               <h1 className="text-xl font-bold text-gray-900 mb-3">
                 {ad.description}
               </h1>
-              
+
               <p className="text-sm text-gray-600 leading-relaxed mb-4">
                 {ad.offerType} discount available for a limited period.
               </p>
-              
+
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500 text-xs">Category:</span>
@@ -400,7 +410,7 @@ const InnerPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Store Contact */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-base font-semibold text-gray-900 mb-4">Store Details</h3>
@@ -472,49 +482,47 @@ const InnerPage = () => {
                   {
                     breakpoint: 640,
                     settings: {
-                      slidesToShow: 1.2,
+                      slidesToShow: 1,
                       slidesToScroll: 1,
                       arrows: false,
-                      centerMode: true,
-                      centerPadding: '20px',
+                      centerMode: false,
                     }
                   }
                 ]}
                 className="offer-slider"
               >
-                {relatedAds.map((item) => (
-                  <div key={item._id} className="px-2">
-                    <div
-                      className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                      onClick={() => handleOfferClick(item._id)}
-                    >
-                      <div className="relative h-40">
-                        <img
-                          src={item.adsImages?.[0] || '/placeholder-image.jpg'}
-                          alt={item.description}
-                          className="w-full h-full object-cover"
-                        />
-                        {item.offerType && (
-                          <div className="absolute top-2 right-2">
-                            <span className="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded-full">
-                              {item.offerType}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-sm text-gray-900 mb-2 line-clamp-1">
-                          {item.description}
-                        </h3>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-violet-600 font-semibold text-xs">
-                            {item.storeId?.storeName}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {formatDate(item.endDate)}
-                          </span>
-                        </div>
-                      </div>
+                {relatedAds.map((relatedOffer) => (
+                  <div key={relatedOffer._id} className="px-2 h-full">
+                    <div className="h-full">
+                      <OfferCard
+                        offer={{
+                          _id: relatedOffer._id,
+                          description: relatedOffer.description,
+                          image: relatedOffer.adsImages?.[0],
+                          offerType: relatedOffer.offerType,
+                          endDate: relatedOffer.endDate,
+                          startDate: relatedOffer.startDate,
+                          store: {
+                            storeName: relatedOffer.storeId?.storeName,
+                            location: relatedOffer.storeId?.location,
+                            district: relatedOffer.storeId?.district,
+                            category: relatedOffer.storeId?.category,
+                            logoUrl: relatedOffer.storeId?.logoUrl,
+                            contact: relatedOffer.storeId?.contact,
+                            email: relatedOffer.storeId?.email,
+                            address: relatedOffer.storeId?.address
+                          }
+                        }}
+                        onCopyLink={(offerId) => {
+                          const shareUrl = `${window.location.origin}/offerdetails/${offerId}`;
+                          navigator.clipboard.writeText(shareUrl);
+                          toast.success('Link copied to clipboard!');
+                        }}
+                        relatedAds={relatedAds.filter(item =>
+                          item._id !== relatedOffer._id &&
+                          item.storeId?.category === relatedOffer.storeId?.category
+                        ).slice(0, 4)}
+                      />
                     </div>
                   </div>
                 ))}
@@ -527,16 +535,19 @@ const InnerPage = () => {
         <style jsx>{`
           .offer-slider-container {
             margin: 0 -8px;
+            overflow: hidden;
           }
           .offer-slider {
             position: relative;
           }
           .offer-slider .slick-track {
             display: flex !important;
-            gap: 1rem;
+            margin-left: 0;
+            margin-right: 0;
           }
           .offer-slider .slick-slide {
-            height: inherit !important;
+            height: auto !important;
+            padding: 0 8px;
           }
           .offer-slider .slick-slide > div {
             height: 100%;
@@ -552,6 +563,9 @@ const InnerPage = () => {
           @media (max-width: 768px) {
             .thumbnail-slider {
               margin: 0 -4px;
+            }
+            .offer-slider .slick-slide {
+              padding: 0 4px;
             }
           }
         `}</style>

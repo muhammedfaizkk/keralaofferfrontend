@@ -18,7 +18,7 @@ const StoreDisplay = () => {
     const { id } = useParams();
     const { storeads, refetch, loading } = useGetStoreads(id);
     const { deleteStoreads } = useDeleteStoreads();
-
+    const BASE_URL = import.meta.env.VITE_BASE_URL
     const onClose = () => setShowAddStore(false);
     const onSuccess = () => {
         setShowAddStore(false);
@@ -89,7 +89,7 @@ const StoreDisplay = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
                 <div className="relative h-48 md:h-56 lg:h-64">
                     <img
-                        src={storeData.logoUrl}
+                        src={`${BASE_URL}/${storeData.logoUrl}`}
                         alt={storeData.storeName}
                         className="absolute w-full h-full object-cover"
                     />
@@ -222,7 +222,7 @@ const StoreDisplay = () => {
                                         <div className="relative h-48 bg-gray-100">
                                             {ad.adsImages && ad.adsImages.length > 0 ? (
                                                 <img
-                                                    src={ad.adsImages[0]}
+                                                    src={`${BASE_URL}/${ad.adsImages[0]}`}
                                                     alt={`Ad ${index + 1}`}
                                                     className="w-full h-full object-cover"
                                                 />
@@ -289,7 +289,7 @@ const StoreDisplay = () => {
                                         {selectedAd.adsImages.map((img, idx) => (
                                             <div key={idx} className="rounded-lg overflow-hidden">
                                                 <img
-                                                    src={img}
+                                                    src={`${BASE_URL}/${img}`}
                                                     alt={`Ad image ${idx + 1}`}
                                                     className="w-full h-64 object-cover"
                                                 />
