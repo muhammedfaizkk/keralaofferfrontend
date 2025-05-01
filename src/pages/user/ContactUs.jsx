@@ -1,7 +1,79 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Phone, Clock } from 'lucide-react';
+import { useContactSubmit } from '../../hooks/user/Contacthooks';
+import { toast } from 'react-toastify';
 
 function ContactUs() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    service: '',
+    message: ''
+  });
+  const { submitContact, loading } = useContactSubmit();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      toast.error('Please enter your name');
+      return false;
+    }
+    if (!formData.email.trim()) {
+      toast.error('Please enter your email');
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return false;
+    }
+    if (!formData.phone.trim()) {
+      toast.error('Please enter your phone number');
+      return false;
+    }
+    if (!/^[0-9]{10}$/.test(formData.phone)) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return false;
+    }
+    if (!formData.service) {
+      toast.error('Please select a service');
+      return false;
+    }
+    if (!formData.message.trim()) {
+      toast.error('Please enter your message');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    try {
+      await submitContact(formData);
+      toast.success('Message sent successfully!');
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        service: '',
+        message: ''
+      });
+    } catch (error) {
+      toast.error(error.message || 'Failed to send message');
+    }
+  };
+
   return (
     <>
       <div className="relative bg-black text-white">
@@ -44,7 +116,7 @@ function ContactUs() {
                 <Phone className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold mb-2">Contact Info</h3>
-              <p className="text-gray-600">8921016178</p>
+              <p className="text-gray-600">+91 8921016178</p>
             </div>
             {/* Opening Hours Card */}
             <div className="bg-gray-50 p-8 rounded-lg shadow-sm">
@@ -66,37 +138,59 @@ function ContactUs() {
             {/* Form */}
             <div className="bg-white p-8 rounded-lg shadow-lg">
               <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
-              <div className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="Your Name"
                   className="w-full p-4 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="Your Email"
                   className="w-full p-4 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
                   placeholder="Phone Number"
                   className="w-full p-4 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <select className="w-full p-4 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select 
+                  name="service"
+                  value={formData.service}
+                  onChange={handleChange}
+                  className="w-full p-4 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                   <option value="">Select Service</option>
-                  <option value="myshop">My Shop</option>
+                  <option value="myshop">Advertise my shop</option>
                   <option value="enquire">Enquire About An Offer</option>
                   <option value="complaint">Complaint About An Offer</option>
                 </select>
                 <textarea
                   rows="4"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   placeholder="Write Message..."
                   className="w-full p-4 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 ></textarea>
-                <button className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition">
-                  SEND MESSAGE NOW
+                <button 
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full bg-blue-600 text-white py-4 rounded-lg font-bold transition
+                    ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+                >
+                  {loading ? 'SENDING MESSAGE...' : 'SEND MESSAGE NOW'}
                 </button>
-              </div>
+              </form>
             </div>
 
             {/* Map */}

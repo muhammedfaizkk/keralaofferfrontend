@@ -1,29 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
 
-export const useGetStore = () => {
+export const useGetStore = (page = 1, filters = {}) => {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(page);
 
-  const fetchStores = async () => {
+  const fetchStores = useCallback(async () => {
     try {
-      const response = await axiosInstance.get('/Store');
-      setStores(response.data);
+      setLoading(true);
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page,
+        limit: 10, // Items per page
+      });
+
+      // Add filters if they exist and are not empty
+      if (filters.searchTerm?.trim()) params.append('search', filters.searchTerm);
+      if (filters.category?.trim()) params.append('category', filters.category);
+      if (filters.district?.trim()) params.append('district', filters.district);
+
+      console.log('Fetching stores with params:', params.toString());
+      const response = await axiosInstance.get(`/Store?${params.toString()}`);
+      console.log('Store response:', response.data);
+      
+      setStores(response.data.stores || []);
+      setTotalPages(response.data.totalPages || 1);
+      setCurrentPage(response.data.currentPage || 1);
+      setError(null);
     } catch (error) {
-      setError('Error fetching stores');
-      console.error('Error fetching stores:', error);
+      console.error('Error fetching stores:', error.response || error);
+      setError(error.response?.data?.message || 'Error fetching stores');
+      setStores([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, filters.searchTerm, filters.category, filters.district]);
 
   useEffect(() => {
     fetchStores();
-  }, []);
+  }, [fetchStores]);
 
-  return { stores, loading, error, refetch: fetchStores };
+  return { 
+    stores, 
+    loading, 
+    error, 
+    refetch: fetchStores,
+    totalPages,
+    currentPage,
+    setPage: (newPage) => setCurrentPage(newPage)
+  };
 };
 
 

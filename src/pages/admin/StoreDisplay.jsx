@@ -154,11 +154,11 @@ const StoreDisplay = () => {
                             Address
                         </h2>
                         <p className="text-gray-700">{storeData.address}</p>
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <button className="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
                                 View on map <ChevronRight className="w-4 h-4 ml-1" />
                             </button>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 

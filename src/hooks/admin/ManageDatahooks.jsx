@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
-// Fetch Districts Hook
+
 export const useFetchDistricts = () => {
-  const [districts, setDistricts] = useState({});
+  const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchDistricts = async () => {
     try {
       const response = await axiosInstance.get('/districts'); 
-      setDistricts(response.data);
+      setDistricts(response.data || []);
+      setError(null);
     } catch (error) {
       console.error('Error fetching districts:', error);
+      setError('Error fetching districts');
+      setDistricts([]);
     } finally {
       setLoading(false);
     }
@@ -21,7 +25,7 @@ export const useFetchDistricts = () => {
     fetchDistricts();
   }, []);
 
-  return { districts, loading, refetch: fetchDistricts };
+  return { districts, loading, error, refetch: fetchDistricts };
 };
 
 

@@ -19,7 +19,7 @@ function Home() {
       <div className="fixed right-4 bottom-20 flex flex-col gap-3 z-50">
         {/* WhatsApp */}
         <a
-          href="https://wa.me/91XXXXXXXXXX" // replace with actual number
+          href="https://wa.me/918921016178" // replace with actual number
           target="_blank"
           rel="noopener noreferrer"
           className="bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition-all duration-300"
@@ -29,7 +29,7 @@ function Home() {
 
         {/* Call */}
         <a
-          href="tel:+91XXXXXXXXXX" // replace with actual number
+          href="tel:+918921016178" // replace with actual number
           className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300"
         >
           <FaPhoneAlt size={20} />

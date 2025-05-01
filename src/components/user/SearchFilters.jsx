@@ -1,4 +1,5 @@
-import React from 'react';
+"use client"
+
 import { useState, useRef, useEffect, useMemo } from "react"
 import { Search, ChevronDown, X, Filter, RefreshCw, Share2, Copy } from "lucide-react"
 import {
@@ -27,6 +28,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   const location = useLocation()
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search])
 
+  // Fetch filter data
   const { offertypes, loading: offerTypesLoading } = useGetOffertypes()
   const { categories, loading: categoriesLoading } = useGetstorecategory()
   const { districts, loading: districtsLoading } = useFetchDistricts()
@@ -36,10 +38,11 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   // Check if screen is mobile
   const [isMobile, setIsMobile] = useState(false)
 
+  // Handle copying the current URL with filters
   const handleCopyLink = () => {
     const params = new URLSearchParams()
     if (searchQuery) {
-      params.append("q", searchQuery)
+      params.append("search", searchQuery)
     }
 
     // Map filter keys to URL parameter names
@@ -52,8 +55,9 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     }
 
     Object.entries(selectedValues).forEach(([key, value]) => {
-      if (value && value.id && paramMap[key]) {
-        params.append(paramMap[key], value.id)
+      if (value && paramMap[key]) {
+        // Use label for all filters in the URL
+        params.append(paramMap[key], value.label)
       }
     })
 
@@ -71,6 +75,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
       })
   }
 
+  // Check if device is mobile
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768) // md breakpoint in Tailwind is 768px
@@ -137,19 +142,21 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     }
   }
 
+  // Process data for each filter type
   const processedStoreNames = useMemo(() => processData(storeNames, "stores"), [storeNames])
   const processedCategories = useMemo(() => processData(categories, "categories"), [categories])
   const processedDistricts = useMemo(() => processData(districts, "districts"), [districts])
   const processedLocations = useMemo(() => processData(locations, "locations"), [locations])
   const processedOfferTypes = useMemo(() => processData(offertypes, "offertypes"), [offertypes])
 
+  // Define dropdown items
   const dropdownItems = useMemo(
     () => [
       {
         id: "stores",
         label: "All Stores",
         data: processedStoreNames,
-        icon: "\uD83C\uDFEA",
+        icon: "🏪",
         loading: storesLoading,
         paramName: "storeName",
       },
@@ -160,10 +167,6 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         icon: "📑",
         loading: categoriesLoading,
         paramName: "category",
-        filterBy: (category, filters) => {
-          // Add any category-specific filtering logic here if needed
-          return true;
-        },
       },
       {
         id: "districts",
@@ -219,7 +222,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
     const loadFiltersFromURL = () => {
       const newFilters = {}
-      const query = searchParams.get("q")
+      const query = searchParams.get("search")
 
       if (query) {
         setSearchQuery(query)
@@ -230,19 +233,12 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
         const paramValue = searchParams.get(item.paramName)
         if (!paramValue) return
 
-        // For storeName, match by label instead of id
-        if (item.paramName === "storeName") {
-          const matchedOption = item.data.find((option) => 
-            option.label.toLowerCase() === decodeURIComponent(paramValue).toLowerCase()
-          )
-          if (matchedOption) {
-            newFilters[item.label] = matchedOption
-          }
-        } else {
-          const matchedOption = item.data.find((option) => option.id === paramValue)
-          if (matchedOption) {
-            newFilters[item.label] = matchedOption
-          }
+        // For all filters, match by label which is what appears in the URL
+        const decodedValue = decodeURIComponent(paramValue)
+        const matchedOption = item.data.find((option) => option.label.toLowerCase() === decodedValue.toLowerCase())
+
+        if (matchedOption) {
+          newFilters[item.label] = matchedOption
         }
       })
 
@@ -281,11 +277,11 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
       if (!dropdownItem?.data) return
 
       // If value is already an object with label, use it directly
-      if (value.label) {
+      if (value?.label) {
         validFilters[key] = {
-          id: value.id || String(Math.random()),
+          id: value.id || value._id || String(Math.random()),
           label: value.label,
-          originalData: value,
+          originalData: value.originalData || value,
         }
         return
       }
@@ -323,6 +319,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     setIsMobileFiltersOpen(!isMobileFiltersOpen)
   }
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -360,24 +357,18 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
     // Add search query if exists
     if (newQuery) {
-      params.set("q", newQuery)
+      params.set("search", newQuery)
     }
 
     // Add selected filters
     Object.entries(newValues).forEach(([key, value]) => {
-      if (!value || !value.id) return
+      if (!value) return
 
       // Find param name for this filter
       const dropdownItem = dropdownItems.find((item) => item.label === key)
       if (dropdownItem?.paramName) {
-        // For storeName, use the id (ObjectId)
-        if (dropdownItem.paramName === "storeName") {
-          params.set(dropdownItem.paramName, value.id)
-        } else if (dropdownItem.paramName === "category") {
-          params.set(dropdownItem.paramName, value.label)
-        } else {
-          params.set(dropdownItem.paramName, value.id)
-        }
+        // For all filters, use the label value which is more human-readable
+        params.set(dropdownItem.paramName, value.label)
       }
     })
 
@@ -391,52 +382,11 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     )
   }
 
+  // Handle selection of a filter option
   const handleSelect = (dropdownLabel, option) => {
     if (!option) return
 
-    // For stores, ensure we're using the store name
-    if (dropdownLabel === "All Stores") {
-      const newValues = {
-        ...selectedValues,
-        [dropdownLabel]: {
-          id: option.label,  // Use label as id for consistency
-          label: option.label,
-          originalData: option.originalData,
-        },
-      }
-      setSelectedValues(newValues)
-      setDropdownOpen(null)
-
-      // Update URL with store name
-      const params = new URLSearchParams(location.search)
-      params.set("storeName", option.label)
-      if (searchQuery) {
-        params.set("q", searchQuery)
-      }
-
-      // Log the values being set
-      console.log('Setting store filter:', {
-        storeName: option.label,
-        newValues
-      });
-
-      navigate(
-        {
-          pathname: location.pathname,
-          search: params.toString(),
-        },
-        { replace: true }
-      )
-
-      // Ensure we pass the correct format to parent
-      onFilterChange?.({
-        ...newValues,
-        searchQuery,
-      })
-      return
-    }
-
-    // For other filters
+    // For all filters, use consistent format
     const newValues = {
       ...selectedValues,
       [dropdownLabel]: {
@@ -451,12 +401,15 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
     // Update both component state and URL
     updateURLWithFilters(newValues, searchQuery)
+
+    // Ensure we pass the correct format to parent
     onFilterChange?.({
       ...newValues,
       searchQuery,
     })
   }
 
+  // Clear a single filter
   const clearFilter = (label) => {
     const newValues = { ...selectedValues }
     delete newValues[label]
@@ -476,6 +429,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     })
   }
 
+  // Clear all filters
   const clearAllFilters = () => {
     // Clear all state
     setSelectedValues({})
@@ -486,10 +440,9 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
 
     // Notify parent component
     onFilterChange?.({ searchQuery: "" })
-
-    console.log("Filters cleared")
   }
 
+  // Handle search input changes
   const handleSearchChange = (e) => {
     const query = e.target.value
     setSearchQuery(query)
@@ -507,6 +460,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     return () => clearTimeout(delayDebounceFn)
   }
 
+  // Handle dropdown search input changes
   const handleDropdownSearchChange = (e, dropdownLabel) => {
     const query = e.target.value
     setDropdownSearchQueries((prev) => ({
@@ -515,6 +469,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     }))
   }
 
+  // Count active filters
   const getActiveFiltersCount = () => {
     return Object.keys(selectedValues).length + (searchQuery ? 1 : 0)
   }
@@ -527,7 +482,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     return options.filter((option) => option.label.toLowerCase().includes(searchQuery.toLowerCase()))
   }
 
-  // Render function for filter chips
+  // Render filter chips
   const renderFilterChips = () => {
     return Object.entries(selectedValues)
       .map(([dropdownLabel, value]) => {
@@ -585,11 +540,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
           onClick={handleShareFilters}
           className="sm:hidden bg-white border border-violet-200 text-gray-600 hover:text-violet-700 hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 p-2 rounded-full shadow transition-all duration-300"
         >
-          <Share2
-            className={`w-5 h-5 transition-transform duration-300 ${
-              (isMobile && isMobileFiltersOpen) || (!isMobile && isCollapsed) ? "text-violet-600 rotate-180" : ""
-            }`}
-          />
+          <Share2 className="w-5 h-5" />
         </button>
       </div>
 
@@ -761,7 +712,6 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
                   </div>
                 </div>
 
-                
                 <div className="w-full flex flex-wrap justify-between items-center">
                   {totalResults !== undefined && (
                     <div className="px-3 sm:px-6 mt-4 text-sm text-gray-600">

@@ -19,7 +19,7 @@ const InnerPage = () => {
   const [autoSwipe, setAutoSwipe] = useState(true);
   const autoSwipeIntervalRef = useRef(null);
 
-  const BASE_URL = import.meta.env.VITE_BASE_URL
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const { ad, loading: adLoading, error: adError } = useFetchAdById(id);
 
   // Fetch related ads
@@ -85,7 +85,7 @@ const InnerPage = () => {
       return;
     }
     const phoneNumber = ad.storeId.contact.replace(/\D/g, '');
-    const message = `Hi! I'm interested in your offer: ${ad.description}`;
+    const message = `Hi! I'm interested in your offer: ${ad.description || 'your offer'}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -99,7 +99,7 @@ const InnerPage = () => {
   };
 
   const handleShare = async () => {
-    const shareMessage = `Check out this amazing offer: ${ad?.description}`;
+    const shareMessage = `Check out this amazing offer: ${ad?.description || 'Exclusive offer'}`;
     try {
       if (navigator.share) {
         await navigator.share({
@@ -119,6 +119,7 @@ const InnerPage = () => {
 
   const formatDate = (dateString) => {
     try {
+      if (!dateString) return 'Date not available';
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return 'Date not available';
 
@@ -177,6 +178,44 @@ const InnerPage = () => {
     );
   }
 
+  // Slider settings for related offers
+  const relatedOffersSettings = {
+    dots: false,
+    infinite: relatedAds.length > 2,
+    speed: 500,
+    slidesToShow: Math.min(4, relatedAds.length),
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    pauseOnHover: true,
+    arrows: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: Math.min(3, relatedAds.length),
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2, // Show 2 cards on mobile
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          centerMode: true,
+          centerPadding: '20px'
+        }
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 font-poppins">
       {/* Main Content */}
@@ -234,7 +273,7 @@ const InnerPage = () => {
                     >
                       <img
                         src={`${BASE_URL}/${image}` || '/placeholder-image.jpg'}
-                        alt={`${ad.description} - image ${index + 1}`}
+                        alt={`${ad.description || 'Offer'} - image ${index + 1}`}
                         className="absolute inset-0 w-full h-full object-contain bg-gray-50"
                       />
                     </div>
@@ -283,9 +322,11 @@ const InnerPage = () => {
 
                 {/* Offer type badge and like button */}
                 <div className="absolute top-4 right-4 flex space-x-2 z-20">
-                  <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-                    {ad.offerType}
-                  </span>
+                  {ad.offerType && (
+                    <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                      {ad.offerType}
+                    </span>
+                  )}
                   <button
                     onClick={() => setIsLiked(!isLiked)}
                     className="p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform"
@@ -338,34 +379,41 @@ const InnerPage = () => {
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                   <img
-                    src={`${BASE_URL}/${ad.storeId?.logoUrl}` || '/store-placeholder.png'}
-                    alt={ad.storeId?.storeName}
+                    src={ad.storeId?.logoUrl ? `${BASE_URL}/${ad.storeId.logoUrl}` : '/store-placeholder.png'}
+                    alt={ad.storeId?.storeName || 'Store logo'}
                     className="w-full h-full object-cover border border-gray-200"
                   />
                 </div>
                 <div>
-                  <span className="font-medium text-base text-gray-900">{ad.storeId?.storeName}</span>
-                  <p className="text-xs text-gray-500">{ad.storeId?.location}, {ad.storeId?.district}</p>
+                  <span className="font-medium text-base text-gray-900">
+                    {ad.storeId?.storeName || 'Unknown Store'}
+                  </span>
+                  <p className="text-xs text-gray-500">
+                    {ad.storeId?.location || ''}{ad.storeId?.location && ad.storeId?.district ? ', ' : ''}
+                    {ad.storeId?.district || ''}
+                  </p>
                 </div>
               </div>
 
               <h1 className="text-xl font-bold text-gray-900 mb-3">
-                {ad.description}
+                {ad.description || 'Special Offer'}
               </h1>
 
               <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                {ad.offerType} discount available for a limited period.
+                {ad.offerType ? `${ad.offerType} discount available for a limited period.` : 'Special discount available'}
               </p>
 
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500 text-xs">Category:</span>
-                  <span className="font-medium text-xs">{ad.storeId?.category}</span>
+                  <span className="font-medium text-xs">{ad.storeId?.category || 'General'}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-xs">Offer:</span>
-                  <span className="font-bold text-red-600 text-sm">{ad.offerType}</span>
-                </div>
+                {ad.offerType && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-500 text-xs">Offer:</span>
+                    <span className="font-bold text-red-600 text-sm">{ad.offerType}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -437,95 +485,42 @@ const InnerPage = () => {
           <div className="mt-12">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-900">More Offers</h2>
-              <div className="flex gap-2">
-                <button
-                  className="p-2 rounded-full bg-violet-100 text-violet-600 hover:bg-violet-200 transition-colors"
-                  onClick={() => sliderRef.current?.slickPrev()}
-                >
-                  <FaChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded-full bg-violet-100 text-violet-600 hover:bg-violet-200 transition-colors"
-                  onClick={() => sliderRef.current?.slickNext()}
-                >
-                  <FaChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              {relatedAds.length > 2 && (
+                <div className="flex gap-2">
+                  <button
+                    className="p-2 rounded-full bg-violet-100 text-violet-600 hover:bg-violet-200 transition-colors"
+                    onClick={() => sliderRef.current?.slickPrev()}
+                  >
+                    <FaChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="p-2 rounded-full bg-violet-100 text-violet-600 hover:bg-violet-200 transition-colors"
+                    onClick={() => sliderRef.current?.slickNext()}
+                  >
+                    <FaChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="offer-slider-container">
               <Slider
                 ref={sliderRef}
-                dots={false}
-                infinite={relatedAds.length > 4}
-                speed={500}
-                slidesToShow={4}
-                slidesToScroll={1}
-                autoplay={true}
-                autoplaySpeed={3000}
-                pauseOnHover={true}
-                responsive={[
-                  {
-                    breakpoint: 1024,
-                    settings: {
-                      slidesToShow: 3,
-                      slidesToScroll: 1,
-                    }
-                  },
-                  {
-                    breakpoint: 768,
-                    settings: {
-                      slidesToShow: 2,
-                      slidesToScroll: 1,
-                    }
-                  },
-                  {
-                    breakpoint: 640,
-                    settings: {
-                      slidesToShow: 1,
-                      slidesToScroll: 1,
-                      arrows: false,
-                      centerMode: false,
-                    }
-                  }
-                ]}
+                {...relatedOffersSettings}
                 className="offer-slider"
               >
-                {relatedAds.map((relatedOffer) => (
-                  <div key={relatedOffer._id} className="px-2 h-full">
-                    <div className="h-full">
-                      <OfferCard
-                        offer={{
-                          _id: relatedOffer._id,
-                          description: relatedOffer.description,
-                          image: relatedOffer.adsImages?.[0],
-                          offerType: relatedOffer.offerType,
-                          endDate: relatedOffer.endDate,
-                          startDate: relatedOffer.startDate,
-                          store: {
-                            storeName: relatedOffer.storeId?.storeName,
-                            location: relatedOffer.storeId?.location,
-                            district: relatedOffer.storeId?.district,
-                            category: relatedOffer.storeId?.category,
-                            logoUrl: relatedOffer.storeId?.logoUrl,
-                            contact: relatedOffer.storeId?.contact,
-                            email: relatedOffer.storeId?.email,
-                            address: relatedOffer.storeId?.address
-                          }
-                        }}
-                        onCopyLink={(offerId) => {
-                          const shareUrl = `${window.location.origin}/offerdetails/${offerId}`;
-                          navigator.clipboard.writeText(shareUrl);
-                          toast.success('Link copied to clipboard!');
-                        }}
-                        relatedAds={relatedAds.filter(item =>
-                          item._id !== relatedOffer._id &&
-                          item.storeId?.category === relatedOffer.storeId?.category
-                        ).slice(0, 4)}
-                      />
-                    </div>
+                {/* {relatedAds.map((relatedOffer) => (
+                  <div key={relatedOffer._id} className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <OfferCard
+                      offer={relatedOffer}
+                      onCopyLink={(offerId) => {
+                        const shareUrl = `${window.location.origin}/offerdetails/${offerId}`;
+                        navigator.clipboard.writeText(shareUrl);
+                        toast.success('Link copied to clipboard!');
+                      }}
+                    />
                   </div>
-                ))}
+                ))} */}
               </Slider>
             </div>
           </div>
