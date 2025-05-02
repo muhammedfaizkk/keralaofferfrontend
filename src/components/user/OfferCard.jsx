@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaLink, FaCalendarAlt, FaClock, FaStore, FaMapMarkerAlt } from "react-icons/fa";
+import { incrementadsClickCount } from '../../hooks/common/Adscount';
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -12,14 +13,10 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
 
   if (!offer || !offer.endDate) return null;
 
-  if (!offer || !offer.endDate) return null;
-
   const endDate = new Date(offer.endDate);
-  endDate.setHours(23, 59, 59, 999); // consider full day
+  endDate.setHours(23, 59, 59, 999);
   const isExpired = endDate < new Date();
-  
 
-  // ✅ Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-IN', {
@@ -32,26 +29,25 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
   const getRemainingTime = () => {
     const now = new Date();
     const end = new Date(offer.endDate);
-    end.setHours(23, 59, 59, 999); // Include entire day
-  
+    end.setHours(23, 59, 59, 999);
     const timeDiff = end - now;
-  
+
     if (timeDiff <= 0) return null;
-  
+
     const isToday = now.toDateString() === end.toDateString();
     if (isToday) return 'Ends Today';
-  
+
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  
+
     if (days > 0) return `${days} day${days > 1 ? 's' : ''} left`;
     if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} left`;
-  
+
     return 'Ending soon';
   };
-  
 
-  const handleOfferClick = (offerId) => {
+  const handleOfferClick = async (offerId) => {
+    await incrementadsClickCount(); 
     navigate(`/offerdetails/${offerId}`);
   };
 
@@ -59,8 +55,6 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
 
   if (isExpired) return null;
 
-
-  
   const offerImage = offer.adsImages && offer.adsImages.length > 0 ? offer.adsImages[0] : null;
 
   return (
@@ -72,7 +66,6 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
         style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
       >
         <div className="relative flex-grow">
-          {/* Image Container with Aspect Ratio */}
           <div className="relative w-full" style={{ paddingBottom: '75%' }}>
             <img
               src={`${BASE_URL}${offerImage || offer.store?.logoUrl || 'https://via.placeholder.com/400x300?text=No+Image'}`}
@@ -82,7 +75,6 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
 
-          {/* Store Info */}
           <div className="absolute bottom-2 left-2 right-2 text-white">
             <div className="flex items-center gap-2 mb-1">
               <FaStore className="w-3 h-3" />
@@ -98,7 +90,6 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
             </div>
           </div>
 
-          {/* Copy Link */}
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -112,7 +103,6 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
             </div>
           </button>
 
-          {/* Remaining Time */}
           {remainingTime && (
             <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium
               ${remainingTime === 'Ending soon'
@@ -127,7 +117,6 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
         </div>
 
         <div className="px-4 pt-4 flex-grow-0">
-          {/* Offer Details */}
           <div className="flex flex-col gap-2 mb-3">
             <div className="flex items-center justify-between">
               <span className="px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-medium tracking-wide">
@@ -153,10 +142,6 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
         </button>
       </div>
 
-      {/* Related Ads Section */}
-      
-
-      {/* Add custom styles */}
       <style jsx>{`
         .related-offers-slider {
           margin: 0 -8px;

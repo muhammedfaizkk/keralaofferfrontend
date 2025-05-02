@@ -4,13 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
+import { incrementcategoryClickCount } from '../../hooks/common/Ctegoryclickcount';
 
 function Categories() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const navigate = useNavigate();
   const { categories, loading, error } = useGetstorecategory();
   const BASE_URL = import.meta.env.VITE_BASE_URL
-  const handleSelect = (index, categoryTitle) => {
+
+
+  const handleSelect = async (index, categoryTitle) => {
+    await incrementcategoryClickCount()
     setSelectedIndex(index);
     navigate(`/offers?category=${encodeURIComponent(categoryTitle)}`);
   };
@@ -39,7 +43,7 @@ function Categories() {
         breakpoints={{
           320: { slidesPerView: 4 },
           768: { slidesPerView: 5 },
-          1024: { slidesPerView: 10},
+          1024: { slidesPerView: 10 },
         }}
         loop={true}
         autoplay={{

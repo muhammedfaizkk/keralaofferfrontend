@@ -28,7 +28,7 @@ export const incrementVisitorsCount = async () => {
 
 export const resetVisitorsCount = async () => {
   try {
-    const response = await axiosInstance.post('/reset'); // assuming POST /visitors/reset
+    const response = await axiosInstance.post('/reset'); 
     return response.data.count;
   } catch (error) {
     console.error('Error resetting visitors count:', error);

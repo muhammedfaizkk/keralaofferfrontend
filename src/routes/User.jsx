@@ -8,7 +8,7 @@ import AboutUs from '../pages/user/AboutUs';
 import Offers from '../pages/user/Offers';
 import Footer from '../components/user/Footer';
 import Header from '../components/user/Header'
-import { incrementVisitorsCount } from '../hooks/common/Visitorscount'; // adjust the path as needed
+import { incrementVisitorsCount } from '../hooks/common/Visitorscount'; 
 
 
 const User = () => {

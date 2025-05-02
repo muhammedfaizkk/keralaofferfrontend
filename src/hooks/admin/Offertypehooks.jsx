@@ -8,11 +8,31 @@ export const useGetOffertypes = () => {
   const [offertypes, setOffertypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    totalItems: 0,
+  });
+  const [search, setSearch] = useState('');
 
-  const fetchOffertypes = async () => {
+  const fetchOffertypes = async (page = 1, limit = 10, searchQuery = '') => {
     try {
-      const response = await axiosInstance.get('/offertype');
+      setLoading(true);
+      const response = await axiosInstance.get('/offertype', {
+        params: {
+          page,
+          limit,
+          search: searchQuery,
+        },
+      });
       setOffertypes(response?.data?.data);
+      setPagination({
+        page: response?.data?.currentPage,
+        limit: parseInt(limit),
+        totalPages: response?.data?.totalPages,
+        totalItems: response?.data?.totalItems,
+      });
     } catch (error) {
       setError('Error fetching offertypes');
       console.error('Error fetching offertypes:', error);
@@ -25,9 +45,16 @@ export const useGetOffertypes = () => {
     fetchOffertypes();
   }, []);
 
-  return { offertypes, loading, error, refetch: fetchOffertypes };
+  return { 
+    offertypes, 
+    loading, 
+    error, 
+    pagination,
+    refetch: fetchOffertypes,
+    setSearch,
+    search,
+  };
 };
-
 
 
 
