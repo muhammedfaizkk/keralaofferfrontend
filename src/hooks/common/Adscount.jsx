@@ -10,6 +10,27 @@ export const incrementadsClickCount = async () => {
   }
 };
 
+export const incrementAdsClickseparateLy = async (adId) => {
+  try {
+    const response = await axiosInstance.put(`/storeads/click/${adId}`);
+    return response.data.totalClicks;
+  } catch (error) {
+    console.error('Error incrementing click count:', error);
+    return null;
+  }
+};
+export const resetAdClickCount = async (adId) => {
+  try {
+    const response = await axiosInstance.put(`/storeads/reset-clicks/${adId}`);
+    return response.data.totalClicks;
+  } catch (error) {
+    console.error('Error resetting ad click count:', error);
+    return null;
+  }
+};
+
+
+
 export const resetadsVisitorsCount = async () => {
   try {
     const response = await axiosInstance.post('/adsreset');

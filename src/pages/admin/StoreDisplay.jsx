@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-    MapPin, Trash2, User, Phone, Mail, Home, Tag,
-    Clock, Star, Search, Plus, Image as ImageIcon, ChevronRight, X
+    MapPin, Trash2, User, Phone, Home, Tag,
+    Clock, Search, Plus, Image as ImageIcon, X, Eye
 } from 'lucide-react';
 
 import Addstoreads from '../../components/admin/forms/Addstoreads';
@@ -82,6 +82,7 @@ const StoreDisplay = () => {
     }
 
     const storeData = storeads[0].storeId;
+    const clicks = storeads[0].clicks;
     const storeLocation = storeads[0].storeId.location;
 
     return (
@@ -188,10 +189,11 @@ const StoreDisplay = () => {
                         </div>
                     </div>
 
-                    {/* Ads Section */}
                     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                         <div className="border-b border-gray-200 p-5">
-                            <h2 className="text-xl font-semibold text-gray-800">Current Ads ({filteredAds.length})</h2>
+                            <h2 className="text-xl font-semibold text-gray-800">
+                                Current Ads ({filteredAds.length})
+                            </h2>
                         </div>
 
                         {filteredAds.length === 0 ? (
@@ -202,62 +204,78 @@ const StoreDisplay = () => {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5">
-                                {filteredAds.map((ad, index) => (
-                                    <div
-                                        key={index}
-                                        className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer relative"
-                                        onClick={() => openImageModal(ad)}
-                                    >
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteClick(ad._id);
-                                            }}
-                                            className="absolute top-2 right-2 z-10 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                                            title="Delete this ad"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                {filteredAds.map((ad, index) => {
+                                    const adStats = storeads.find((s) => s._id === ad._id);
 
-                                        <div className="relative h-48 bg-gray-100">
-                                            {ad.adsImages && ad.adsImages.length > 0 ? (
-                                                <img
-                                                    src={`${BASE_URL}/${ad.adsImages[0]}`}
-                                                    alt={`Ad ${index + 1}`}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                                                    <ImageIcon className="w-12 h-12 text-gray-400" />
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer relative"
+                                            onClick={() => openImageModal(ad)}
+                                        >
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteClick(ad._id);
+                                                }}
+                                                className="absolute top-2 right-2 z-10 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                                title="Delete this ad"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+
+                                            <div className="relative h-48 bg-gray-100">
+                                                {ad.adsImages && ad.adsImages.length > 0 ? (
+                                                    <img
+                                                        src={`${BASE_URL}/${ad.adsImages[0]}`}
+                                                        alt={`Ad ${index + 1}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                                                        <ImageIcon className="w-12 h-12 text-gray-400" />
+                                                    </div>
+                                                )}
+                                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                                                    <span className="text-xs bg-white text-gray-800 px-2 py-1 rounded">
+                                                        {new Date(ad.startDate).toLocaleDateString()} -{" "}
+                                                        {new Date(ad.endDate).toLocaleDateString()}
+                                                    </span>
                                                 </div>
-                                            )}
-                                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-                                                <span className="text-xs bg-white text-gray-800 px-2 py-1 rounded">
-                                                    {new Date(ad.startDate).toLocaleDateString()} - {new Date(ad.endDate).toLocaleDateString()}
-                                                </span>
+                                            </div>
+
+                                            <div className="p-4">
+                                                <h3 className="font-medium text-lg text-gray-800 mb-2">
+                                                    {ad.offerType || "Special Offer"}
+                                                </h3>
+                                                <p className="text-gray-600 mb-4 line-clamp-2">
+                                                    {ad.description || "No description provided"}
+                                                </p>
+
+                                                <div className="flex justify-between items-center">
+                                                    <span className="inline-flex items-center text-sm text-gray-500">
+                                                        <Clock className="w-4 h-4 mr-1" />
+                                                        {new Date(ad.createdAt).toLocaleDateString()}
+                                                    </span>
+                                                    <button
+                                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openImageModal(ad);
+                                                        }}
+                                                    >
+                                                        View details
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex justify-start items-center mt-2 text-sm text-gray-500">
+                                                    <Eye className="w-4 h-4 mr-1" />
+                                                    {adStats?.clicks ?? 0} views
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-4">
-                                            <h3 className="font-medium text-lg text-gray-800 mb-2">{ad.offerType || 'Special Offer'}</h3>
-                                            <p className="text-gray-600 mb-4 line-clamp-2">{ad.description || 'No description provided'}</p>
-                                            <div className="flex justify-between items-center">
-                                                <span className="inline-flex items-center text-sm text-gray-500">
-                                                    <Clock className="w-4 h-4 mr-1" />
-                                                    {new Date(ad.createdAt).toLocaleDateString()}
-                                                </span>
-                                                <button
-                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        openImageModal(ad);
-                                                    }}
-                                                >
-                                                    View details
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

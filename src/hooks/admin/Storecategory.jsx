@@ -100,3 +100,47 @@ export const useDeletestorecategory = () => {
 
   return { deleteCategory, loading, error };
 };
+
+
+
+export const useIncrementCategoryClick = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const incrementClick = async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axiosInstance.put(`/category/${id}/click`);
+      return res.data.totalClicks; 
+    } catch (err) {
+      setError('Failed to increment click count');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { incrementClick, loading, error };
+};
+
+export const useResetCategoryClick = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const resetClick = async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await axiosInstance.put(`/category/${id}/reset-clicks`);
+      return true;
+    } catch (err) {
+      setError('Failed to reset click count');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { resetClick, loading, error };
+};

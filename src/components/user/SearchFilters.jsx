@@ -11,6 +11,7 @@ import {
 } from "../../hooks/user/Filtershook"
 import { toast } from "react-toastify"
 import { useNavigate, useLocation } from "react-router-dom"
+import { useIncrementCategoryClick } from "../../hooks/admin/Storecategory"
 
 function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initialFilters = {} }) {
   const [dropdownOpen, setDropdownOpen] = useState(null)
@@ -27,6 +28,7 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   const navigate = useNavigate()
   const location = useLocation()
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search])
+  const { incrementClick, loading: clickLoading, error: clickError } = useIncrementCategoryClick()
 
   // Fetch filter data
   const { offertypes, loading: offerTypesLoading } = useGetOffertypes()
@@ -382,32 +384,46 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
     )
   }
 
-  // Handle selection of a filter option
-  const handleSelect = (dropdownLabel, option) => {
-    if (!option) return
+ // Modified handleSelect function to track category clicks
 
-    // For all filters, use consistent format
-    const newValues = {
-      ...selectedValues,
-      [dropdownLabel]: {
-        id: option.id,
-        label: option.label,
-        originalData: option.originalData,
-      },
-    }
+const handleSelect = (dropdownLabel, option) => {
+  if (!option) return
 
-    setSelectedValues(newValues)
-    setDropdownOpen(null)
-
-    // Update both component state and URL
-    updateURLWithFilters(newValues, searchQuery)
-
-    // Ensure we pass the correct format to parent
-    onFilterChange?.({
-      ...newValues,
-      searchQuery,
-    })
+  // For all filters, use consistent format
+  const newValues = {
+    ...selectedValues,
+    [dropdownLabel]: {
+      id: option.id,
+      label: option.label,
+      originalData: option.originalData,
+    },
   }
+
+  setSelectedValues(newValues)
+  setDropdownOpen(null)
+
+  // Track category click when "All Categories" is selected
+  if (dropdownLabel === "All Categories" && option.id) {
+    incrementClick(option.id)
+      .then(() => {
+        // Optional: You could add a success toast or other feedback here
+        console.log("Category click tracked successfully")
+      })
+      .catch((error) => {
+        console.error("Failed to track category click:", error)
+        // Optional: You could add error handling here
+      })
+  }
+
+  // Update both component state and URL
+  updateURLWithFilters(newValues, searchQuery)
+
+  // Ensure we pass the correct format to parent
+  onFilterChange?.({
+    ...newValues,
+    searchQuery,
+  })
+}
 
   // Clear a single filter
   const clearFilter = (label) => {

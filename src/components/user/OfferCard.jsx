@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaLink, FaCalendarAlt, FaClock, FaStore, FaMapMarkerAlt } from "react-icons/fa";
-import { incrementadsClickCount } from '../../hooks/common/Adscount';
+import { incrementadsClickCount, incrementAdsClickseparateLy } from '../../hooks/common/Adscount';
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -47,7 +47,8 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
   };
 
   const handleOfferClick = async (offerId) => {
-    await incrementadsClickCount(); 
+    await incrementadsClickCount();
+    await incrementAdsClickseparateLy(offerId)
     navigate(`/offerdetails/${offerId}`);
   };
 

@@ -13,6 +13,7 @@ const StorecategoryTable = ({ categories = [], onDeleteClick, onEditClick }) => 
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Image</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clicks</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
               </tr>
             </thead>
@@ -24,6 +25,7 @@ const StorecategoryTable = ({ categories = [], onDeleteClick, onEditClick }) => 
                     <img className="w-20" src={`${BASE_URL}/${cat.catPhotographs}`} alt="" />
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700">{cat.title}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{cat.clicks}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <div className="flex space-x-3">
                       <button
