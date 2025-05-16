@@ -5,8 +5,7 @@ const MobileNav = ({ toggleMenu, isMenuOpen }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearch = () => {
-    console.log('Search for:', searchTerm);
-    // Add your search logic here
+   
   };
 
   return (

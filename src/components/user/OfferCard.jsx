@@ -11,13 +11,10 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const sliderRef = React.useRef(null);
 
-  if (!offer || !offer.endDate) return null;
-
-  const endDate = new Date(offer.endDate);
-  endDate.setHours(23, 59, 59, 999);
-  const isExpired = endDate < new Date();
+  if (!offer) return null;
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-IN', {
       day: 'numeric',
@@ -26,24 +23,17 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
     });
   };
 
-  const getRemainingTime = () => {
-    const now = new Date();
+  const getOfferStatus = () => {
+    if (!offer.endDate) return 'No expiration';
+
     const end = new Date(offer.endDate);
     end.setHours(23, 59, 59, 999);
-    const timeDiff = end - now;
-
-    if (timeDiff <= 0) return null;
-
-    const isToday = now.toDateString() === end.toDateString();
-    if (isToday) return 'Ends Today';
-
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-
-    if (days > 0) return `${days} day${days > 1 ? 's' : ''} left`;
-    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} left`;
-
-    return 'Ending soon';
+    const now = new Date();
+    
+    if (end < now) return 'Expired';
+    
+    const days = Math.floor((end - now) / (1000 * 60 * 60 * 24));
+    return days > 0 ? `${days} day${days > 1 ? 's' : ''} left` : 'Ending soon';
   };
 
   const handleOfferClick = async (offerId) => {
@@ -52,17 +42,13 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
     navigate(`/offerdetails/${offerId}`);
   };
 
-  const remainingTime = getRemainingTime();
-
-  if (isExpired) return null;
-
+  const offerStatus = getOfferStatus();
   const offerImage = offer.adsImages && offer.adsImages.length > 0 ? offer.adsImages[0] : null;
 
   return (
     <>
       <div
-        className={`group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer 
-        ${remainingTime === 'Ending soon' ? 'ring-2 ring-red-400' : ''}`}
+        className={`group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer`}
         onClick={() => handleOfferClick(offer._id)}
         style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
       >
@@ -104,14 +90,16 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
             </div>
           </button>
 
-          {remainingTime && (
+          {offerStatus && (
             <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium
-              ${remainingTime === 'Ending soon'
-                ? 'bg-red-500 text-white'
-                : 'bg-white/90 text-gray-700'}`}>
+              ${offerStatus.includes('Expired') 
+                ? 'bg-gray-500 text-white'
+                : offerStatus.includes('Ending soon') 
+                  ? 'bg-red-500 text-white'
+                  : 'bg-white/90 text-gray-700'}`}>
               <div className="flex items-center gap-1">
                 <FaClock className="w-3 h-3" />
-                {remainingTime}
+                {offerStatus}
               </div>
             </div>
           )}
@@ -121,11 +109,18 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
           <div className="flex flex-col gap-2 mb-3">
             <div className="flex items-center justify-between">
               <span className="px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-medium tracking-wide">
-                {offer.offerType}
+                {offer.offerType || 'Special Offer'}
               </span>
               <span className="text-xs text-gray-500">
                 {offer.storeId?.category || ''}
               </span>
+            </div>
+            {/* <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
+              {offer.description || 'No description available'}
+            </h3> */}
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <FaCalendarAlt className="w-3 h-3" />
+              <span>Valid until: {formatDate(offer.endDate)}</span>
             </div>
           </div>
         </div>
@@ -136,8 +131,8 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
             handleOfferClick(offer._id);
           }}
           className="w-full px-4 py-2.5 bg-violet-600 text-white text-sm font-medium 
-                       transform transition-all duration-200 hover:bg-violet-700 hover:shadow-lg 
-                       active:scale-98 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
+                     transform transition-all duration-200 hover:bg-violet-700 hover:shadow-lg 
+                     active:scale-98 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
         >
           View Details
         </button>

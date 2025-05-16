@@ -53,7 +53,7 @@ const Header = () => {
               <div className="flex justify-between items-center p-4">
                 <Link to="/" onClick={() => setMenuOpen(false)}>
                   <img
-                    src="/logonav.png"
+                    src="/keralaofferlogo.svgn"
                     alt="Kerala Offer Logo"
                     className="w-[120px] h-[35px] object-contain"
                   />

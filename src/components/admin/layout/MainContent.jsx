@@ -40,7 +40,6 @@ const MainContent = () => {
   const chartData = [
     { name: 'Stores', value: storeCount },
     { name: 'Visitors', value: visitorCount },
-    { name: 'Category Clicks', value: categoryClicks },
     { name: 'Ads Clicks', value: adsClicks },
   ];
 
@@ -80,7 +79,6 @@ const MainContent = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <MetricCard title="Stores" value={storeCount} />
         <MetricCard title="Site Visitors" value={visitorCount} />
-        <MetricCard title="Category Clicks" value={categoryClicks} />
         <MetricCard title="Ads Clicks" value={adsClicks} />
         <MetricCard title="Total Ads" value={adImagesLoading ? 'Loading...' : totalImages} />
       </div>

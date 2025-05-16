@@ -13,7 +13,7 @@ export const useGetallstorenames = () => {
         try {
             const response = await axiosInstance.get('/store/names');
             setStoreNames(response?.data);
-            console.log('response?.data?.data',response?.data);
+          
             
         } catch (error) {
             setError('Error fetching store names');
@@ -61,7 +61,6 @@ export const useGetstorecategory = () => {
     const fetchCategories = async () => {
         try {
             const response = await axiosInstance.get('/category');
-            console.log(response?.data);
             setCategories(response?.data);
         } catch (error) {
             setError('Error fetching categories');
@@ -87,7 +86,7 @@ export const useFetchDistricts = () => {
         try {
             const response = await axiosInstance.get('/districts');
             setDistricts(response.data);
-            console.log('districts',response.data);
+            
             
         } catch (error) {
             console.error('Error fetching districts:', error);

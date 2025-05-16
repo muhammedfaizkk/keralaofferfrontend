@@ -31,7 +31,7 @@ export const useCreateStoreads = () => {
     const [error, setError] = useState(null);
 
     const createStoreads = async (storeadsData, id) => {
-        console.log('thi is hook', id);
+        
 
         setLoading(true);
         setError(null);

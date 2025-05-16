@@ -11,15 +11,14 @@ function OfferSection() {
   const [likedOffers, setLikedOffers] = useState({});
   const [filteredAds, setFilteredAds] = useState([]);
 
-  // Filter out expired offers and sort by creation date (newest first)
-  useEffect(() => {
-    if (ads) {
-      const validAds = ads
-        .filter(ad => new Date(ad.endDate) > new Date()) // Only show active offers
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by creation date (newest first)
-      setFilteredAds(validAds);
-    }
-  }, [ads]);
+  console.log('ads',ads)
+useEffect(() => {
+  if (ads) {
+    const sortedAds = [...ads].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Newest first
+    setFilteredAds(sortedAds);
+  }
+}, [ads]);
+
 
   const handleOfferClick = (adId) => {
     navigate(`/offer/${adId}`);

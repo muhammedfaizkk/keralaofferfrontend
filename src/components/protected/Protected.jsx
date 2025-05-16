@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 const Protected = ({ children }) => {
   const isAuthenticated = localStorage.getItem('keralaoffertoken');
-  console.log("Authenticated?", isAuthenticated);
+  
 
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;

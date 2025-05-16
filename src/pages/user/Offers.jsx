@@ -11,7 +11,6 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa"
 
 const Offers = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const currentPage = Number.parseInt(searchParams.get("page")) || 1
 

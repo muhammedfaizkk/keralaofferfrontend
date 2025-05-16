@@ -21,8 +21,6 @@ export const useFetchAds = (page = 1, filters = {}) => {
             if (filtersObj.location) params.append('location', filtersObj.location);
             if (filtersObj.offerType) params.append('offerType', filtersObj.offerType);
 
-            console.log('Sending filters to API:', Object.fromEntries(params.entries()));
-
             const response = await axiosInstance.get(`/storeads/adswithstore?${params.toString()}`);
             setAds(response.data.data || []);
             setTotalPages(response.data.totalPages || 1);

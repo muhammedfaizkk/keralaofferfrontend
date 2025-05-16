@@ -10,7 +10,6 @@ export const useGetstorecategory = () => {
     const fetchCategories = async () => {
         try {
             const response = await axiosInstance.get('/category');
-            console.log(response?.data);
             setCategories(response?.data);
         } catch (error) {
             setError('Error fetching categories');

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { FaYoutube, FaFacebookF, FaInstagram } from 'react-icons/fa';
-import { Twitter } from 'lucide-react'; 
+import { Twitter } from 'lucide-react';
 
 
 
@@ -22,9 +22,9 @@ const Footer = () => {
                 {/* Nav Links */}
                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-6 lg:gap-8 font-medium text-black text-sm md:text-base lg:text-lg">
                     <Link to="/" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">Home</Link>
-                    <Link to="/about" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">About</Link>
+                    <Link to="/aboutus" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">About</Link>
                     <Link to="/offers" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">Offers</Link>
-                    <Link to="/contact" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">Contact</Link>
+                    <Link to="/contactus" className="hover:text-gray-300 transition-colors text-xs sm:text-sm">Contact</Link>
                 </div>
 
                 {/* Social Icons */}

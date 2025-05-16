@@ -23,9 +23,9 @@ export const useGetStore = (page = 1, filters = {}) => {
       if (filters.category?.trim()) params.append('category', filters.category);
       if (filters.district?.trim()) params.append('district', filters.district);
 
-      console.log('Fetching stores with params:', params.toString());
+    
       const response = await axiosInstance.get(`/Store?${params.toString()}`);
-      console.log('Store response:', response.data);
+     
       
       setStores(response.data.stores || []);
       setTotalPages(response.data.totalPages || 1);
