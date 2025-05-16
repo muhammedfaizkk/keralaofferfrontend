@@ -64,7 +64,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         {/* Logo */}
         <img
-          src="/keralaofferlogo.svg"
+          src="/logonav.png"
           alt="Kerala Offer Logo"
           className="h-[50px] sm:h-[60px] xl:h-[70px] w-auto object-contain"
         />

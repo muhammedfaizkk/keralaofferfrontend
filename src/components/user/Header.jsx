@@ -14,7 +14,7 @@ const Header = () => {
             <div className="flex items-center gap-2 rounded-md px-3 py-2">
               <Link to="/">
                 <img
-                  src="/keralaofferlogo.svg"
+                  src="/logonav.png"
                   alt="Kerala Offer Logo"
                   className="h-[50px] sm:h-[60px] xl:h-[70px] w-auto object-contain"
                 />
@@ -53,7 +53,7 @@ const Header = () => {
               <div className="flex justify-between items-center p-4">
                 <Link to="/" onClick={() => setMenuOpen(false)}>
                   <img
-                    src="/keralaofferlogo.svgn"
+                    src="/logonav.png"
                     alt="Kerala Offer Logo"
                     className="w-[120px] h-[35px] object-contain"
                   />
