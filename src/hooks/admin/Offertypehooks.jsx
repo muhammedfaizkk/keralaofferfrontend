@@ -4,7 +4,7 @@ import axiosInstance from '../../api/axiosInstance';
 
 
 
-export const useGetOffertypes = () => {
+export const useGetOffertypes = ({ paginated = true } = {}) => {
   const [offertypes, setOffertypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,15 +24,20 @@ export const useGetOffertypes = () => {
           page,
           limit,
           search: searchQuery,
+          paginated: paginated.toString(), // 'true' or 'false'
         },
       });
-      setOffertypes(response?.data?.data);
-      setPagination({
-        page: response?.data?.currentPage,
-        limit: parseInt(limit),
-        totalPages: response?.data?.totalPages,
-        totalItems: response?.data?.totalItems,
-      });
+
+      setOffertypes(response?.data?.data || []);
+
+      if (paginated) {
+        setPagination({
+          page: response?.data?.currentPage,
+          limit: parseInt(limit),
+          totalPages: response?.data?.totalPages,
+          totalItems: response?.data?.totalItems,
+        });
+      }
     } catch (error) {
       setError('Error fetching offertypes');
       console.error('Error fetching offertypes:', error);
@@ -45,80 +50,79 @@ export const useGetOffertypes = () => {
     fetchOffertypes();
   }, []);
 
-  return { 
-    offertypes, 
-    loading, 
-    error, 
+  return {
+    offertypes,
+    loading,
+    error,
     pagination,
     refetch: fetchOffertypes,
     setSearch,
     search,
   };
-};
 
+}
 
+  export const useCreateOffertype = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-export const useCreateOffertype = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const createOffertype = async (offertypeData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axiosInstance.post('/offertype', offertypeData);
+        return response.data;
+      } catch (err) {
+        setError('Failed to create offertype');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const createOffertype = async (offertypeData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axiosInstance.post('/offertype', offertypeData);
-      return response.data;
-    } catch (err) {
-      setError('Failed to create offertype');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    return { createOffertype, loading, error };
   };
 
-  return { createOffertype, loading, error };
-};
 
+  export const useUpdateOffertype = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-export const useUpdateOffertype = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const updateOffertype = async (id, updatedData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axiosInstance.put(`/offertype/${id}`, updatedData);
+        return response.data;
+      } catch (err) {
+        setError('Failed to update offertype');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const updateOffertype = async (id, updatedData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axiosInstance.put(`/offertype/${id}`, updatedData);
-      return response.data;
-    } catch (err) {
-      setError('Failed to update offertype');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    return { updateOffertype, loading, error };
   };
 
-  return { updateOffertype, loading, error };
-};
 
+  export const useDeleteOffertype = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-export const useDeleteOffertype = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const deleteOffertype = async (id) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await axiosInstance.delete(`/offertype/${id}`);
+        return id;
+      } catch (err) {
+        setError('Failed to delete offertype');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const deleteOffertype = async (id) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await axiosInstance.delete(`/offertype/${id}`);
-      return id;
-    } catch (err) {
-      setError('Failed to delete offertype');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    return { deleteOffertype, loading, error };
   };
-
-  return { deleteOffertype, loading, error };
-};

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {
   FaStore, FaThLarge, FaUser, FaCog, FaChevronDown,
-  FaChevronUp, FaTimes, FaHome, FaSignOutAlt, FaImages
+  FaChevronUp, FaTimes, FaHome, FaSignOutAlt, FaImages,
+  FaChartBar // Added for Reports icon
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +11,8 @@ const Sidebar = ({ isOpen, onClose }) => {
     stores: false,
     banners: false,
     dataManage: false,
-    settings: false
+    settings: false,
+    reports: false // Added for reports dropdown
   });
 
   const navigate = useNavigate();
@@ -20,7 +22,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       stores: false,
       banners: false,
       dataManage: false,
-      settings: false
+      settings: false,
+      reports: false
     });
   };
 
@@ -29,11 +32,10 @@ const Sidebar = ({ isOpen, onClose }) => {
     if (window.innerWidth < 768) {
       closeAllDropdowns();
       if (onClose) onClose(); // Close sidebar
-
-      // Delay navigation to allow sidebar to close first
+    
       setTimeout(() => {
         navigate(path);
-      }, 300); // Make sure this matches your sidebar transition duration
+      }, 300); 
     } else {
       navigate(path);
     }
@@ -104,7 +106,6 @@ const Sidebar = ({ isOpen, onClose }) => {
             {dropdowns.banners && (
               <div className="ml-10 transition-all duration-300 ease-in-out">
                 <div onClick={() => navigateTo('/admin/banners')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">All Banners</div>
-
               </div>
             )}
           </div>
@@ -123,6 +124,23 @@ const Sidebar = ({ isOpen, onClose }) => {
                 <div onClick={() => navigateTo('/admin/locations')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Location</div>
                 <div onClick={() => navigateTo('/admin/store-category')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Store Category</div>
                 <div onClick={() => navigateTo('/admin/offer-types')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Offer Types</div>
+              </div>
+            )}
+          </div>
+
+          {/* Reports Section - Added this new section */}
+          <div>
+            <div onClick={() => toggleDropdown('reports')} className="flex items-center justify-between p-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
+              <div className="flex items-center">
+                <FaChartBar className="mr-3" />
+                <span>Reports</span>
+              </div>
+              {dropdowns.reports ? <FaChevronUp /> : <FaChevronDown />}
+            </div>
+            {dropdowns.reports && (
+              <div className="ml-10 transition-all duration-300 ease-in-out">
+                <div onClick={() => navigateTo('/admin/adsreport')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Stores Reports</div>
+                {/* <div onClick={() => navigateTo('/admin/reports/ads')} className="text-sm py-1 text-gray-600 hover:text-blue-600 cursor-pointer">Ads Reports</div> */}
               </div>
             )}
           </div>

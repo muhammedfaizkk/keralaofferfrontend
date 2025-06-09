@@ -6,7 +6,7 @@ import { incrementadsClickCount, incrementAdsClickseparateLy } from '../../hooks
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
+const OfferCard = ({ offer, onCopyLink }) => {
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const sliderRef = React.useRef(null);
@@ -29,9 +29,9 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
     const end = new Date(offer.endDate);
     end.setHours(23, 59, 59, 999);
     const now = new Date();
-    
+
     if (end < now) return 'Expired';
-    
+
     const days = Math.floor((end - now) / (1000 * 60 * 60 * 24));
     return days > 0 ? `${days} day${days > 1 ? 's' : ''} left` : 'Ending soon';
   };
@@ -83,18 +83,20 @@ const OfferCard = ({ offer, onCopyLink, relatedAds }) => {
               e.stopPropagation();
               onCopyLink?.(offer._id);
             }}
-            className="absolute top-2 right-2 z-10 transform hover:scale-110 transition-all duration-200"
+            className="absolute top-2 right-2 z-10 flex items-center gap-1 bg-white/90 px-2 py-1 rounded-full shadow-lg text-gray-700 text-xs hover:bg-white"
+            title="Copy Offer Link"
           >
-            <div className="bg-white/90 p-2 rounded-full shadow-lg hover:bg-white">
-              <FaLink className="w-4 h-4 text-gray-700" />
-            </div>
+            <FaLink className="w-3 h-3" />
+            <span>Copy</span>
           </button>
+
+
 
           {offerStatus && (
             <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium
-              ${offerStatus.includes('Expired') 
+              ${offerStatus.includes('Expired')
                 ? 'bg-gray-500 text-white'
-                : offerStatus.includes('Ending soon') 
+                : offerStatus.includes('Ending soon')
                   ? 'bg-red-500 text-white'
                   : 'bg-white/90 text-gray-700'}`}>
               <div className="flex items-center gap-1">

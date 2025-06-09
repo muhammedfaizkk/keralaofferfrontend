@@ -11,7 +11,6 @@ function OfferSection() {
   const [likedOffers, setLikedOffers] = useState({});
   const [filteredAds, setFilteredAds] = useState([]);
 
-  console.log('ads',ads)
 useEffect(() => {
   if (ads) {
     const sortedAds = [...ads].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Newest first

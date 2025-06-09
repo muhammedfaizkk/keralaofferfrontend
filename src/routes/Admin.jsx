@@ -12,13 +12,23 @@ import StoreDisplay from '../pages/admin/StoreDisplay';
 import Login from '../pages/common/Login';
 import Protected from '../components/protected/Protected';
 import AddStores from '../components/admin/forms/Addstores';
+import Adsreport from '../pages/admin/Adsreport';
+import Storereport from '../pages/admin/Storereport';
 
 const Admin = () => (
   <Routes>
+    {/* ✅ Public login route — not protected */}
     <Route path="/login" element={<Login />} />
-    
-   
-    <Route path="/" element={<Protected><AdminLayout /></Protected>}>
+
+    {/* ✅ Protected admin routes */}
+    <Route
+      path="/"
+      element={
+        <Protected>
+          <AdminLayout />
+        </Protected>
+      }
+    >
       <Route index element={<Dashboard />} />
       <Route path="profile" element={<Profile />} />
       <Route path="store" element={<Stores />} />
@@ -27,7 +37,9 @@ const Admin = () => (
       <Route path="store-category" element={<Storecategory />} />
       <Route path="offer-types" element={<Offertype />} />
       <Route path="storeads/:id" element={<StoreDisplay />} />
-      <Route path="addstore" element={<AddStores/>} />
+      <Route path="addstore" element={<AddStores />} />
+      <Route path="adsreport" element={<Adsreport />} />
+      <Route path="storereports" element={<Storereport />} />
     </Route>
   </Routes>
 );

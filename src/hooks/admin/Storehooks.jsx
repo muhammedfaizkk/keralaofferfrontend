@@ -8,6 +8,7 @@ export const useGetStore = (page = 1, filters = {}) => {
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(page);
+   const [storeCount, setstoreCount] = useState();
 
   const fetchStores = useCallback(async () => {
     try {
@@ -26,10 +27,12 @@ export const useGetStore = (page = 1, filters = {}) => {
     
       const response = await axiosInstance.get(`/Store?${params.toString()}`);
      
+
       
       setStores(response.data.stores || []);
       setTotalPages(response.data.totalPages || 1);
       setCurrentPage(response.data.currentPage || 1);
+      setstoreCount(response.data.totalStores)
       setError(null);
     } catch (error) {
       console.error('Error fetching stores:', error.response || error);
@@ -45,7 +48,8 @@ export const useGetStore = (page = 1, filters = {}) => {
   }, [fetchStores]);
 
   return { 
-    stores, 
+    stores,
+    storeCount,
     loading, 
     error, 
     refetch: fetchStores,

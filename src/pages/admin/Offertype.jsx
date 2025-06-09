@@ -17,7 +17,8 @@ function Offertype() {
     pagination, 
     setSearch,
     search 
-  } = useGetOffertypes();
+  } = useGetOffertypes({ paginated: true }); 
+
   
   const [searchInput, setSearchInput] = useState('');
 
@@ -90,7 +91,7 @@ function Offertype() {
             />
           </div>
 
-          {/* Pagination Controls */}
+    
           {pagination.totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
               <div className="text-sm text-gray-500">

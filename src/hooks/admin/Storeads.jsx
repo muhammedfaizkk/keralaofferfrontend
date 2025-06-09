@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect ,useRef ,useCallback } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
 
@@ -54,7 +54,6 @@ export const useCreateStoreads = () => {
 };
 
 
-// UPDATE Hook
 export const useUpdateStoreads = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -102,26 +101,110 @@ export const useGetTotalAdImagesCount = () => {
     return { totalImages, loading, error, refetch: fetchTotalAdImages };
 };
 
-export const useGetAllAdsWithStore = () => {
-    const [adsWithStore, setAdsWithStore] = useState([]);
+
+export const useGetAllAdsWithStore = (filters = {}) => {
+    const [adsWithStore, setAdsWithStore] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    const prevFiltersRef = useRef(null);
+    const isInitialMount = useRef(true);
 
-    const fetchAdsWithStore = async () => {
+    const fetchAdsWithStore = useCallback(async (filterParams) => {
         try {
-            const response = await axiosInstance.get('/storeads/adswithstore');
+            setLoading(true);
+            setError(null);
+            
+            const {
+                page = 1,
+                limit = 16,
+                searchQuery = '',
+                offerType = '',
+                storeName = '',
+                category = '',
+                district = '',
+                location = ''
+            } = filterParams || {};
+
+            const params = new URLSearchParams();
+            params.set('page', page.toString());
+            params.set('limit', limit.toString());
+
+            // Only add parameters if they have values
+            if (searchQuery && searchQuery.trim()) {
+                params.set('searchQuery', searchQuery.trim());
+            }
+            if (offerType && offerType.trim()) {
+                params.set('offerType', offerType.trim());
+            }
+            if (storeName && storeName.trim()) {
+                params.set('storeName', storeName.trim());
+            }
+            if (category && category.trim()) {
+                params.set('category', category.trim());
+            }
+            if (district && district.trim()) {
+                params.set('district', district.trim());
+            }
+            if (location && location.trim()) {
+                params.set('location', location.trim());
+            }
+
+            console.log('API Request URL:', `/storeads/adswithstoreadmin?${params.toString()}`);
+            console.log('Filters being sent:', filterParams);
+
+            const response = await axiosInstance.get(`/storeads/adswithstoreadmin?${params.toString()}`);
             setAdsWithStore(response.data);
         } catch (error) {
-            setError('Error fetching ads with store information');
+            const errorMessage = error.response?.data?.message || 'Error fetching ads with store information';
+            setError(errorMessage);
             console.error('Error fetching ads with store:', error);
+            console.error('Error response:', error.response?.data);
         } finally {
             setLoading(false);
         }
-    };
-
-    useEffect(() => {
-        fetchAdsWithStore();
     }, []);
+
+    // Compare filters to prevent unnecessary API calls
+    const filtersEqual = useCallback((filters1, filters2) => {
+        if (!filters1 || !filters2) return false;
+        
+        const keys = ['page', 'limit', 'searchQuery', 'offerType', 'storeName', 'category', 'district', 'location'];
+        
+        return keys.every(key => {
+            const val1 = filters1[key] || '';
+            const val2 = filters2[key] || '';
+            return val1 === val2;
+        });
+    }, []);
+
+    // Effect to handle filter changes
+    useEffect(() => {
+        // Skip initial mount comparison
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            prevFiltersRef.current = filters;
+            fetchAdsWithStore(filters);
+            return;
+        }
+
+        // Only fetch if filters have actually changed
+        if (!filtersEqual(filters, prevFiltersRef.current)) {
+            prevFiltersRef.current = { ...filters };
+            fetchAdsWithStore(filters);
+        }
+    }, [
+        filters.page,
+        filters.limit,
+        filters.searchQuery,
+        filters.offerType,
+        filters.storeName,
+        filters.category,
+        filters.district,
+        filters.location,
+        fetchAdsWithStore,
+        filtersEqual
+    ]);
 
     return {
         adsWithStore,
@@ -129,9 +212,120 @@ export const useGetAllAdsWithStore = () => {
         error,
         refetch: fetchAdsWithStore
     };
-}
+};
 
+export const useGetAllAdsWithStoreadmin = (filters = {}) => {
+    const [adsWithStore, setAdsWithStore] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    // Use ref to track previous filters to prevent unnecessary calls
+    const prevFiltersRef = useRef(null);
+    const isInitialMount = useRef(true);
 
+    const fetchAdsWithStore = useCallback(async (filterParams) => {
+        try {
+            setLoading(true);
+            setError(null);
+            
+            const {
+                page = 1,
+                limit = 10,
+                searchQuery = '',
+                offerType = '',
+                storeName = '',
+                category = '',
+                district = '',
+                location = ''
+            } = filterParams || {};
+
+            const params = new URLSearchParams();
+            params.set('page', page.toString());
+            params.set('limit', limit.toString());
+
+            // Only add parameters if they have values
+            if (searchQuery && searchQuery.trim()) {
+                params.set('searchQuery', searchQuery.trim());
+            }
+            if (offerType && offerType.trim()) {
+                params.set('offerType', offerType.trim());
+            }
+            if (storeName && storeName.trim()) {
+                params.set('storeName', storeName.trim());
+            }
+            if (category && category.trim()) {
+                params.set('category', category.trim());
+            }
+            if (district && district.trim()) {
+                params.set('district', district.trim());
+            }
+            if (location && location.trim()) {
+                params.set('location', location.trim());
+            }
+
+            console.log('API Request URL:', `/storeads/adswithstoreadmin?${params.toString()}`);
+            console.log('Filters being sent:', filterParams);
+
+            const response = await axiosInstance.get(`/storeads/adswithstoreadmin?${params.toString()}`);
+            setAdsWithStore(response.data);
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Error fetching ads with store information';
+            setError(errorMessage);
+            console.error('Error fetching ads with store:', error);
+            console.error('Error response:', error.response?.data);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Compare filters to prevent unnecessary API calls
+    const filtersEqual = useCallback((filters1, filters2) => {
+        if (!filters1 || !filters2) return false;
+        
+        const keys = ['page', 'limit', 'searchQuery', 'offerType', 'storeName', 'category', 'district', 'location'];
+        
+        return keys.every(key => {
+            const val1 = filters1[key] || '';
+            const val2 = filters2[key] || '';
+            return val1 === val2;
+        });
+    }, []);
+
+    // Effect to handle filter changes
+    useEffect(() => {
+        // Skip initial mount comparison
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            prevFiltersRef.current = filters;
+            fetchAdsWithStore(filters);
+            return;
+        }
+
+        // Only fetch if filters have actually changed
+        if (!filtersEqual(filters, prevFiltersRef.current)) {
+            prevFiltersRef.current = { ...filters };
+            fetchAdsWithStore(filters);
+        }
+    }, [
+        filters.page,
+        filters.limit,
+        filters.searchQuery,
+        filters.offerType,
+        filters.storeName,
+        filters.category,
+        filters.district,
+        filters.location,
+        fetchAdsWithStore,
+        filtersEqual
+    ]);
+
+    return {
+        adsWithStore,
+        loading,
+        error,
+        refetch: fetchAdsWithStore
+    };
+};
 export const useDeleteStoreads = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);

@@ -23,6 +23,7 @@ const AddStores = ({ mode = 'add', store = null, onClose, refetch }) => {
         category: '',
         logoUrl: null
     });
+    console.log('store', store);
 
     const [errors, setErrors] = useState({
         storeName: false,
@@ -48,14 +49,13 @@ const AddStores = ({ mode = 'add', store = null, onClose, refetch }) => {
                 email: store.email || '',
                 address: store.address || '',
                 district: store.district || '',
-                location: store.location?._id || '',
-                category: store.category?._id || '',
+                location: store.location?.locationName || '', // Changed to locationName
+                category: store.category?.title || '', // Changed to title
                 logoUrl: null
             });
             setPreviewImage(store.logoUrl);
         }
     }, [mode, store]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -135,8 +135,8 @@ const AddStores = ({ mode = 'add', store = null, onClose, refetch }) => {
                     <h2 className="text-xl font-semibold">
                         {mode === 'add' ? 'Add New Store' : 'Edit Store'}
                     </h2>
-                    <button 
-                        onClick={onClose} 
+                    <button
+                        onClick={onClose}
                         className="text-gray-500 hover:text-gray-700"
                         aria-label="Close modal"
                     >

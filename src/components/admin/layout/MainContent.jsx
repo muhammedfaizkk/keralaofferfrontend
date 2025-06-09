@@ -9,9 +9,9 @@ import { resetcategoryclickCount, getcategoryclickCount } from '../../../hooks/c
 import { getadsVisitorsCount, resetadsVisitorsCount } from '../../../hooks/common/Adscount';
 
 const MainContent = () => {
-  const { stores, loading, error } = useGetStore();
+  const { storeCount, loading, error } = useGetStore();
   const { totalImages, loading: adImagesLoading, error: adImagesError } = useGetTotalAdImagesCount();
-  const storeCount = stores?.length || 0;
+  const storeCounts = storeCount || 0;
   const [visitorCount, setVisitorCount] = useState(0);
   const [categoryClicks, setCategoryClicks] = useState(0);
   const [adsClicks, setAdsClicks] = useState(0);
@@ -77,7 +77,7 @@ const MainContent = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <MetricCard title="Stores" value={storeCount} />
+        <MetricCard title="Stores" value={storeCounts} />
         <MetricCard title="Site Visitors" value={visitorCount} />
         <MetricCard title="Ads Clicks" value={adsClicks} />
         <MetricCard title="Total Ads" value={adImagesLoading ? 'Loading...' : totalImages} />

@@ -11,11 +11,12 @@ const Addlocations = ({ onClose, locationToEdit,refetch }) => {
   const { updateLocation, loading: updateLoading, error: updateError } = useUpdateLocation();
 
 
+  console.log(locationToEdit);
   
   useEffect(() => {
     if (locationToEdit) {
       setSelectedDistrict(locationToEdit.district);
-      setSelectedLocation(locationToEdit.location);
+      setSelectedLocation(locationToEdit.locationName);
     }
   }, [locationToEdit]);
 
@@ -80,7 +81,6 @@ const Addlocations = ({ onClose, locationToEdit,refetch }) => {
             </select>
           </div>
 
-          {/* Location Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Enter Location</label>
             <input

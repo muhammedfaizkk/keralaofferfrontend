@@ -11,11 +11,13 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useLogin();
 
-  useEffect(() => {
-    if (localStorage.getItem('token')) {
-      navigate('/admin');
-    }
-  }, [navigate]);
+useEffect(() => {
+  const token = localStorage.getItem('keralaoffertoken');
+  if (token) {
+    navigate('/admin', { replace: true });
+  }
+}, []);
+
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

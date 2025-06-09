@@ -9,7 +9,7 @@ export const useFetchDistricts = () => {
 
   const fetchDistricts = async () => {
     try {
-      const response = await axiosInstance.get('/districts'); 
+      const response = await axiosInstance.get('/districts');
       setDistricts(response.data || []);
       setError(null);
     } catch (error) {
@@ -29,18 +29,47 @@ export const useFetchDistricts = () => {
 };
 
 
-export const useGetLocations = () => {
+export const useGetLocations = (options = {}) => {
+  const {
+    page = 1,
+    limit = 10,
+    paginated = true, 
+  } = options;
+
   const [locations, setLocations] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPaginated, setIsPaginated] = useState(paginated);
 
-  const fetchLocations = async () => {
+  const fetchLocations = async (currentPage = page, currentLimit = limit, shouldPaginate = paginated) => {
     try {
-      const response = await axiosInstance.get('/locations'); // Make sure this matches your API route
-      setLocations(response.data);
-    } catch (error) {
-      setError('Error fetching locations');
-      console.error('Error fetching locations:', error);
+      setLoading(true);
+
+      // Build query parameters based on pagination preference
+      let queryParams = `?paginated=${shouldPaginate}`;
+
+      if (shouldPaginate) {
+        queryParams += `&page=${currentPage}&limit=${currentLimit}`;
+      }
+
+      const response = await axiosInstance.get(`/locations${queryParams}`);
+
+      setLocations(response.data.data);
+      setTotalCount(response.data.totalCount);
+      setIsPaginated(response.data.paginated);
+
+      // Only set pagination data if response is paginated
+      if (response.data.paginated) {
+        setTotalPages(response.data.totalPages);
+      } else {
+        setTotalPages(1); // Reset to 1 for non-paginated
+      }
+
+    } catch (err) {
+      setError("Error fetching locations");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -48,11 +77,36 @@ export const useGetLocations = () => {
 
   useEffect(() => {
     fetchLocations();
-  }, []);
+  }, [page, limit, paginated]);
 
-  return { locations, loading, error, refetch: fetchLocations };
+  // Method to switch between paginated and non-paginated
+  const togglePagination = (shouldPaginate) => {
+    fetchLocations(1, limit, shouldPaginate);
+  };
+
+  // Method to fetch all data (non-paginated)
+  const fetchAllLocations = () => {
+    fetchLocations(1, limit, false);
+  };
+
+  // Method to fetch paginated data
+  const fetchPaginatedLocations = (currentPage = 1, currentLimit = limit) => {
+    fetchLocations(currentPage, currentLimit, true);
+  };
+
+  return {
+    locations,
+    totalPages,
+    totalCount,
+    loading,
+    error,
+    isPaginated,
+    refetch: fetchLocations,
+    togglePagination,
+    fetchAllLocations,
+    fetchPaginatedLocations,
+  };
 };
-
 
 export const useGetLocationByDistrict = (district) => {
   const [location, setLocation] = useState([]);
@@ -83,7 +137,7 @@ export const useGetLocationByDistrict = (district) => {
 
   return { location, loading, error, refetch: fetchLocation };
 };
-// Create Location Hook
+
 export const useCreateLocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -105,7 +159,7 @@ export const useCreateLocation = () => {
   return { createLocation, loading, error };
 };
 
-// Update Location Hook
+
 export const useUpdateLocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -127,7 +181,7 @@ export const useUpdateLocation = () => {
   return { updateLocation, loading, error };
 };
 
-// Delete Location Hook
+
 export const useDeleteLocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

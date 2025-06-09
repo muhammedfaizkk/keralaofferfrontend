@@ -31,10 +31,10 @@ function SearchFilters({ handleShareFilters, onFilterChange, totalResults, initi
   const { incrementClick, loading: clickLoading, error: clickError } = useIncrementCategoryClick()
 
   // Fetch filter data
-  const { offertypes, loading: offerTypesLoading } = useGetOffertypes()
+  const { offertypes, loading: offerTypesLoading } = useGetOffertypes({ paginated: false })
   const { categories, loading: categoriesLoading } = useGetstorecategory()
   const { districts, loading: districtsLoading } = useFetchDistricts()
-  const { locations, loading: locationsLoading } = useGetLocations()
+ const { locations, loading: locationsLoading } = useGetLocations({ paginated: false });
   const { storeNames, loading: storesLoading } = useGetallstorenames()
 
   // Check if screen is mobile

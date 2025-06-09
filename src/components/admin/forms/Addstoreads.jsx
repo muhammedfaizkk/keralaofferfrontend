@@ -16,7 +16,7 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
     const [description, setDescription] = useState('');
     const { createStoreads, loading: createLoading } = useCreateStoreads();
     const { updateStoreads, loading: updateLoading } = useUpdateStoreads();
-    const { offertypes } = useGetOffertypes();
+   const { offertypes } = useGetOffertypes({ paginated: false });
 
     const loading = createLoading || updateLoading;
 
@@ -201,23 +201,22 @@ const Addstoreads = ({ onClose, onSuccess, editData }) => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Ad Images <span className="text-red-500">*</span>
-                                    <span className="text-xs text-gray-500 ml-1">(Max 5 images, 5MB each)</span>
                                 </label>
 
                                 <label className={`flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-all ${existingImages.length + adsImages.length >= 5 ? 'border-gray-200 bg-gray-50' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'}`}>
                                     <div className="flex flex-col items-center justify-center text-center">
                                         <ImageIcon className="h-6 w-6 text-gray-400 mb-1" />
-                                        <p className="text-xs text-gray-600">
+                                        {/* <p className="text-xs text-gray-600">
                                             {existingImages.length + adsImages.length >= 5 ?
                                                 'Maximum images reached' :
                                                 'Click to upload or drag and drop'}
-                                        </p>
-                                        <p className="text-xs text-gray-500 mt-1">
+                                        </p> */}
+                                        {/* <p className="text-xs text-gray-500 mt-1">
                                             PNG, JPG, WebP up to 5MB
-                                        </p>
-                                        <p className="text-xs text-blue-600 mt-1">
+                                        </p> */}
+                                        {/* <p className="text-xs text-blue-600 mt-1">
                                             {5 - existingImages.length - adsImages.length} slots remaining
-                                        </p>
+                                        </p> */}
                                     </div>
                                     <input
                                         type="file"

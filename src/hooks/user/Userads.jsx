@@ -1,53 +1,61 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useMemo } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
 export const useFetchAds = (page = 1, filters = {}) => {
-    const [ads, setAds] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [totalPages, setTotalPages] = useState(1);
-    const [currentPage, setCurrentPage] = useState(page);
+  const [ads, setAds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(page);
 
-    const fetchAdsWithStore = async (pageNumber = 1, filtersObj = filters) => {
-        try {
-            setLoading(true);
-            setError(null);
+  const stableFilters = useMemo(() => filters, [
+    filters.storeName, 
+    filters.category, 
+    filters.district, 
+    filters.location, 
+    filters.offerType, 
+    filters.searchQuery 
+  ]);
 
-            // Build query string from filters
-            const params = new URLSearchParams({ page: pageNumber });
-            if (filtersObj.storeName) params.append('storeName', filtersObj.storeName);
-            if (filtersObj.category) params.append('category', filtersObj.category);
-            if (filtersObj.district) params.append('district', filtersObj.district);
-            if (filtersObj.location) params.append('location', filtersObj.location);
-            if (filtersObj.offerType) params.append('offerType', filtersObj.offerType);
+  const fetchAdsWithStore = async (pageNumber = 1, filtersObj = stableFilters) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-            const response = await axiosInstance.get(`/storeads/adswithstore?${params.toString()}`);
-            setAds(response.data.data || []);
-            setTotalPages(response.data.totalPages || 1);
-            setCurrentPage(response.data.currentPage || 1);
-        } catch (error) {
-            console.error('Error fetching ads:', error);
-            setError(error.response?.data?.message || 'Failed to fetch ads');
-        } finally {
-            setLoading(false);
-        }
-    };
+      const params = new URLSearchParams({ page: pageNumber });
+      if (filtersObj.storeName) params.append('storeName', filtersObj.storeName);
+      if (filtersObj.category) params.append('category', filtersObj.category);
+      if (filtersObj.district) params.append('district', filtersObj.district);
+      if (filtersObj.location) params.append('location', filtersObj.location);
+      if (filtersObj.offerType) params.append('offerType', filtersObj.offerType);
+      if (filtersObj.searchQuery) params.append('searchQuery', filtersObj.searchQuery); // Changed from search to searchQuery
 
-    useEffect(() => {
-        fetchAdsWithStore(page, filters);
-        // eslint-disable-next-line
-    }, [page, JSON.stringify(filters)]);
+      const response = await axiosInstance.get(`/storeads/adswithstore?${params.toString()}`);
 
-    return {
-        ads,
-        loading,
-        error,
-        totalPages,
-        currentPage,
-        setPage: fetchAdsWithStore // You can call this to change pages
-    };
+      setAds(response.data.data || []);
+      setTotalPages(response.data.totalPages || 1);
+      setCurrentPage(response.data.currentPage || 1);
+    } catch (err) {
+      console.error('Error fetching ads:', err);
+      setError(err.response?.data?.message || 'Failed to fetch ads');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdsWithStore(page, stableFilters);
+  }, [page, stableFilters]);
+
+  return {
+    ads,
+    loading,
+    error,
+    totalPages,
+    currentPage,
+    setPage: (p) => fetchAdsWithStore(p, stableFilters),
+  };
 };
-
 export const useFetchStoreAds = (storeId) => {
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);

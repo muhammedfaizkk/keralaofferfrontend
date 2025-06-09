@@ -94,10 +94,9 @@ function Banners() {
         </div>
       </div>
 
-      {/* Modal */}
+      
       {isModalOpen && <Addbanner onClose={() => setIsModalOpen(false)} onSuccess={handleBannerAdded} />}
 
-      {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
         <DeleteConfirmation
           itemName={selectedBanner?.title}

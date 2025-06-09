@@ -13,8 +13,8 @@ export const useGetallstorenames = () => {
         try {
             const response = await axiosInstance.get('/store/names');
             setStoreNames(response?.data);
-          
-            
+
+
         } catch (error) {
             setError('Error fetching store names');
             console.error('Error fetching store names:', error);
@@ -29,15 +29,41 @@ export const useGetallstorenames = () => {
 
     return { storeNames, loading, error, refetch: fetchStoreNames };
 };
-export const useGetOffertypes = () => {
+
+export const useGetOffertypes = ({ paginated = true } = {}) => {
     const [offertypes, setOffertypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalItems: 0,
+    });
+    const [search, setSearch] = useState('');
 
-    const fetchOffertypes = async () => {
+    const fetchOffertypes = async (page = 1, limit = 10, searchQuery = '') => {
         try {
-            const response = await axiosInstance.get('/offertype');
-            setOffertypes(response?.data?.data);
+            setLoading(true);
+            const response = await axiosInstance.get('/offertype', {
+                params: {
+                    page,
+                    limit,
+                    search: searchQuery,
+                    paginated: paginated.toString(), // 'true' or 'false'
+                },
+            });
+
+            setOffertypes(response?.data?.data || []);
+
+            if (paginated) {
+                setPagination({
+                    page: response?.data?.currentPage,
+                    limit: parseInt(limit),
+                    totalPages: response?.data?.totalPages,
+                    totalItems: response?.data?.totalItems,
+                });
+            }
         } catch (error) {
             setError('Error fetching offertypes');
             console.error('Error fetching offertypes:', error);
@@ -50,8 +76,17 @@ export const useGetOffertypes = () => {
         fetchOffertypes();
     }, []);
 
-    return { offertypes, loading, error, refetch: fetchOffertypes };
-};
+    return {
+        offertypes,
+        loading,
+        error,
+        pagination,
+        refetch: fetchOffertypes,
+        setSearch,
+        search,
+    };
+
+}
 
 export const useGetstorecategory = () => {
     const [categories, setCategories] = useState([]);
@@ -86,8 +121,8 @@ export const useFetchDistricts = () => {
         try {
             const response = await axiosInstance.get('/districts');
             setDistricts(response.data);
-            
-            
+
+
         } catch (error) {
             console.error('Error fetching districts:', error);
         } finally {
